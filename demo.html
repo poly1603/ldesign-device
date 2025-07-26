@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ldesign/device 演示</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .device-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #1890ff;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .info-value {
+            font-size: 16px;
+            color: #333;
+            margin-top: 4px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active { background-color: #52c41a; }
+        .status-inactive { background-color: #d9d9d9; }
+        .log {
+            background: #1f1f1f;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #40a9ff;
+        }
+        .responsive-demo {
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .device-mobile .responsive-demo {
+            background: #ff7875;
+            color: white;
+        }
+        .device-tablet .responsive-demo {
+            background: #ffa940;
+            color: white;
+        }
+        .device-desktop .responsive-demo {
+            background: #73d13d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 @ldesign/device 演示</h1>
+    <p>这个演示展示了 @ldesign/device 的核心功能。</p>
+
+    <div class="demo-section">
+        <h2>📱 当前设备信息</h2>
+        <div class="device-info" id="deviceInfo">
+            <!-- 设备信息将在这里显示 -->
+        </div>
+        
+        <div class="responsive-demo" id="responsiveDemo">
+            <h3>响应式演示区域</h3>
+            <p>这个区域会根据设备类型改变颜色</p>
+        </div>
+        
+        <button onclick="refreshDeviceInfo()">🔄 刷新设备信息</button>
+    </div>
+
+    <div class="demo-section">
+        <h2>📊 设备特性检测</h2>
+        <div id="deviceFeatures">
+            <!-- 设备特性将在这里显示 -->
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>📝 实时日志</h2>
+        <p>设备信息变化时会在下方显示日志：</p>
+        <div class="log" id="logContainer">
+            <div>等待设备变化事件...</div>
+        </div>
+        <button onclick="clearLog()">🗑️ 清空日志</button>
+    </div>
+
+    <script type="module">
+        // 导入构建后的模块
+        import { getDeviceInfo, onDeviceChange } from './dist/index.js'
+        
+        // 更新设备信息显示
+        function updateDeviceInfo() {
+            const info = getDeviceInfo()
+            const container = document.getElementById('deviceInfo')
+            
+            container.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">设备类型</div>
+                    <div class="info-value">${getDeviceTypeLabel(info.type)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">屏幕方向</div>
+                    <div class="info-value">${getOrientationLabel(info.orientation)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">屏幕尺寸</div>
+                    <div class="info-value">${info.width} × ${info.height}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">像素比</div>
+                    <div class="info-value">${info.pixelRatio}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">触摸设备</div>
+                    <div class="info-value">${info.isTouchDevice ? '是' : '否'}</div>
+                </div>
+            `
+            
+            // 更新响应式演示区域
+            document.body.className = `device-${info.type}`
+            
+            // 更新设备特性
+            updateDeviceFeatures(info)
+        }
+
+        function updateDeviceFeatures(info) {
+            const container = document.getElementById('deviceFeatures')
+            const features = [
+                { name: '移动设备', active: info.type === 'mobile' },
+                { name: '平板设备', active: info.type === 'tablet' },
+                { name: '桌面设备', active: info.type === 'desktop' },
+                { name: '竖屏模式', active: info.orientation === 'portrait' },
+                { name: '横屏模式', active: info.orientation === 'landscape' },
+                { name: '触摸支持', active: info.isTouchDevice },
+                { name: '高分辨率', active: info.pixelRatio > 1 },
+                { name: '小屏幕', active: Math.min(info.width, info.height) < 768 }
+            ]
+            
+            container.innerHTML = features.map(feature => `
+                <div style="margin: 8px 0;">
+                    <span class="status-indicator ${feature.active ? 'status-active' : 'status-inactive'}"></span>
+                    ${feature.name}
+                </div>
+            `).join('')
+        }
+
+        function getDeviceTypeLabel(type) {
+            const labels = {
+                mobile: '📱 移动设备',
+                tablet: '📱 平板设备',
+                desktop: '💻 桌面设备'
+            }
+            return labels[type] || '❓ 未知设备'
+        }
+
+        function getOrientationLabel(orientation) {
+            const labels = {
+                portrait: '📱 竖屏',
+                landscape: '📱 横屏'
+            }
+            return labels[orientation] || '❓ 未知方向'
+        }
+
+        function addLog(message) {
+            const container = document.getElementById('logContainer')
+            const time = new Date().toLocaleTimeString()
+            const logEntry = document.createElement('div')
+            logEntry.innerHTML = `[${time}] ${message}`
+            container.appendChild(logEntry)
+            container.scrollTop = container.scrollHeight
+        }
+
+        // 监听设备变化
+        onDeviceChange((event) => {
+            addLog(`设备信息变化: ${event.changes.join(', ')}`)
+            addLog(`当前设备: ${event.current.type} (${event.current.width}×${event.current.height})`)
+            updateDeviceInfo()
+        })
+
+        // 全局函数
+        window.refreshDeviceInfo = () => {
+            updateDeviceInfo()
+            addLog('手动刷新设备信息')
+        }
+
+        window.clearLog = () => {
+            document.getElementById('logContainer').innerHTML = '<div>日志已清空</div>'
+        }
+
+        // 初始化显示
+        updateDeviceInfo()
+        addLog('设备检测器初始化完成')
+        addLog(`检测到设备: ${getDeviceInfo().type}`)
+    </script>
+</body>
+</html>

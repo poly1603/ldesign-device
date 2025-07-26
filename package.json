@@ -1,7 +1,7 @@
 {
   "name": "@ldesign/device",
   "version": "1.0.0",
-  "description": "设备检测工具库",
+  "description": "🔍 功能强大的设备信息检测库，支持设备类型识别、屏幕方向检测等核心功能",
   "type": "module",
   "main": "./lib/index.js",
   "module": "./es/index.js",
@@ -13,25 +13,20 @@
       "require": "./lib/index.js",
       "types": "./types/index.d.ts"
     },
-    "./decorators": {
-      "import": "./es/decorators.js",
-      "require": "./lib/decorators.js",
-      "types": "./types/decorators.d.ts"
+    "./core": {
+      "import": "./es/core.js",
+      "require": "./lib/core.js",
+      "types": "./types/core.d.ts"
     },
-    "./plugins/persist": {
-      "import": "./es/plugins/persist.js",
-      "require": "./lib/plugins/persist.js",
-      "types": "./types/plugins/persist.d.ts"
+    "./vue": {
+      "import": "./es/vue.js",
+      "require": "./lib/vue.js",
+      "types": "./types/vue.d.ts"
     },
-    "./plugins/cache": {
-      "import": "./es/plugins/cache.js",
-      "require": "./lib/plugins/cache.js",
-      "types": "./types/plugins/cache.d.ts"
-    },
-    "./store-class": {
-      "import": "./es/store-class.js",
-      "require": "./lib/store-class.js",
-      "types": "./types/store-class.d.ts"
+    "./components": {
+      "import": "./es/components.js",
+      "require": "./lib/components.js",
+      "types": "./types/components.d.ts"
     },
     "./types": {
       "import": "./es/types.js",
@@ -79,31 +74,32 @@
     "postpublish": "echo '🎉 Package published successfully!'"
   },
   "keywords": [
+    "device",
+    "device-detection",
+    "mobile",
+    "tablet",
+    "desktop",
+    "orientation",
+    "responsive",
     "vue",
     "vue3",
-    "pinia",
-    "state-management",
     "typescript",
-    "reactive",
-    "store",
     "ldesign"
   ],
   "author": "LDesign Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/poly1603/ldesign-store.git"
+    "url": "https://github.com/poly1603/ldesign-device.git"
   },
   "bugs": {
-    "url": "https://github.com/poly1603/ldesign-store/issues"
+    "url": "https://github.com/poly1603/ldesign-device/issues"
   },
-  "homepage": "https://github.com/poly1603/ldesign-store#readme",
+  "homepage": "https://github.com/poly1603/ldesign-device#readme",
   "peerDependencies": {
     "vue": "^3.3.0"
   },
-  "dependencies": {
-    "lodash-es": "^4.17.21"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@antfu/eslint-config": "^2.6.4",
     "@rollup/plugin-commonjs": "^25.0.7",

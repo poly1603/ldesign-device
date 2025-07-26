@@ -1,9 +1,9 @@
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
 import commonjs from '@rollup/plugin-commonjs'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import { glob } from 'glob'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import dts from 'rollup-plugin-dts'
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
@@ -23,14 +23,14 @@ const banner = `/*!
 
 // 获取所有入口文件
 const entryFiles = glob.sync('src/**/*.ts', {
-  ignore: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+  ignore: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/components/**/*.tsx'],
 })
 
 // 创建入口对象
 function createEntries(files) {
   const entries = {}
   files.forEach((file) => {
-    const name = path.relative('src', file).replace(/\.ts$/, '')
+    const name = path.relative('src', file).replace(/\.(ts|tsx)$/, '')
     entries[name] = file
   })
   return entries
@@ -59,6 +59,8 @@ export default [
         declaration: false,
         declarationMap: false,
         outDir: 'es',
+        jsx: 'react-jsx',
+        jsxImportSource: 'vue',
       }),
     ],
   },
@@ -86,6 +88,8 @@ export default [
         declaration: false,
         declarationMap: false,
         outDir: 'lib',
+        jsx: 'react-jsx',
+        jsxImportSource: 'vue',
       }),
     ],
   },
@@ -116,6 +120,8 @@ export default [
         tsconfig: './tsconfig.json',
         declaration: false,
         declarationMap: false,
+        jsx: 'react-jsx',
+        jsxImportSource: 'vue',
       }),
     ],
   },
