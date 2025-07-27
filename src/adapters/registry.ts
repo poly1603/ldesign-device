@@ -33,7 +33,7 @@ export class AdapterRegistryImpl implements AdapterRegistry {
    */
   detect(): AdapterFactory | undefined {
     const frameworks = FrameworkDetector.detect()
-    
+
     for (const framework of frameworks) {
       const adapter = this.adapters.get(framework.name)
       if (adapter && adapter.isCompatible()) {

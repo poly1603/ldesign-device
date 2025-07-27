@@ -2,11 +2,11 @@ import type { Ref } from 'vue'
 import { computed, defineComponent, inject, onMounted, onUnmounted, provide, reactive, ref } from 'vue'
 import { getGlobalDeviceDetector } from './core'
 import type { ReactiveDeviceOptions } from './reactive'
-import { createMediaQueryListener, createReactiveDeviceListener, MEDIA_QUERIES } from './reactive'
+import { MEDIA_QUERIES, createMediaQueryListener, createReactiveDeviceListener } from './reactive'
 import type {
   DeviceChangeEvent,
   DeviceDetectionConfig,
-  DeviceInfo
+  DeviceInfo,
 } from './types'
 
 /**
@@ -29,7 +29,7 @@ export function useDevice(options: ReactiveDeviceOptions = {}) {
       onError: (err) => {
         error.value = err
         options.onError?.(err)
-      }
+      },
     })
 
     unsubscribe = listener.subscribe((state) => {
@@ -77,7 +77,7 @@ export function useDevice(options: ReactiveDeviceOptions = {}) {
     isTouchDevice,
 
     // 方法
-    refresh
+    refresh,
   }
 }
 
@@ -96,7 +96,7 @@ export function useDeviceType(options?: DeviceDetectionConfig) {
     deviceType,
     isMobile,
     isTablet,
-    isDesktop
+    isDesktop,
   }
 }
 
@@ -113,7 +113,7 @@ export function useOrientation(options?: DeviceDetectionConfig) {
   return {
     orientation,
     isPortrait,
-    isLandscape
+    isLandscape,
   }
 }
 
@@ -130,7 +130,7 @@ export function useScreenSize(options?: DeviceDetectionConfig) {
   return {
     width,
     height,
-    pixelRatio
+    pixelRatio,
   }
 }
 
@@ -177,9 +177,12 @@ export function useBreakpoints() {
 
   // 当前激活的断点
   const activeBreakpoint = computed(() => {
-    if (isMobile.value) return 'mobile'
-    if (isTablet.value) return 'tablet'
-    if (isDesktop.value) return 'desktop'
+    if (isMobile.value)
+return 'mobile'
+    if (isTablet.value)
+return 'tablet'
+    if (isDesktop.value)
+return 'desktop'
     return 'unknown'
   })
 
@@ -200,7 +203,7 @@ export function useBreakpoints() {
     prefersReducedMotion,
 
     // 当前断点
-    activeBreakpoint
+    activeBreakpoint,
   }
 }
 
@@ -209,7 +212,7 @@ export function useBreakpoints() {
  */
 export function useDeviceChange(
   callback: (event: DeviceChangeEvent) => void,
-  options?: DeviceDetectionConfig
+  options?: DeviceDetectionConfig,
 ) {
   let unsubscribe: (() => void) | null = null
 
@@ -233,7 +236,7 @@ export function useDeviceChange(
 
   return {
     startListening,
-    stopListening
+    stopListening,
   }
 }
 
@@ -243,7 +246,7 @@ export function useDeviceChange(
 export function useCustomMediaQuery(queries: Record<string, string>) {
   const results = reactive<Record<string, boolean>>({})
 
-  const listeners: Array<{ key: string; listener: any; unsubscribe: () => void }> = []
+  const listeners: Array<{ key: string, listener: any, unsubscribe: () => void }> = []
 
   const init = () => {
     Object.entries(queries).forEach(([key, query]) => {
@@ -284,17 +287,17 @@ export function useDeviceFeatures(options?: DeviceDetectionConfig) {
   const isTouchDevice = computed(() => deviceInfo.value.isTouchDevice)
   const hasHighDPI = computed(() => deviceInfo.value.pixelRatio > 1)
   const isSmallScreen = computed(() =>
-    Math.min(deviceInfo.value.width, deviceInfo.value.height) < 768
+    Math.min(deviceInfo.value.width, deviceInfo.value.height) < 768,
   )
   const isLargeScreen = computed(() =>
-    Math.min(deviceInfo.value.width, deviceInfo.value.height) >= 1024
+    Math.min(deviceInfo.value.width, deviceInfo.value.height) >= 1024,
   )
 
   return {
     isTouchDevice,
     hasHighDPI,
     isSmallScreen,
-    isLargeScreen
+    isLargeScreen,
   }
 }
 
@@ -311,8 +314,8 @@ export const DeviceProvider = defineComponent({
   props: {
     config: {
       type: Object as () => DeviceDetectionConfig,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   setup(props, { slots }) {
     const deviceContext = useDevice(props.config)
@@ -321,7 +324,7 @@ export const DeviceProvider = defineComponent({
     provide(DEVICE_CONTEXT_KEY, deviceContext)
 
     return () => slots.default?.()
-  }
+  },
 })
 
 /**

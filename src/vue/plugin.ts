@@ -28,7 +28,7 @@ const defaultOptions: Required<DevicePluginOptions> = {
   registerComponents: true,
   registerDirectives: true,
   registerGlobalProperties: true,
-  componentPrefix: 'L'
+  componentPrefix: 'L',
 }
 
 /**
@@ -51,7 +51,7 @@ export const DevicePlugin: Plugin = {
     // 注册全局属性
     if (opts.registerGlobalProperties) {
       const deviceAPI = useDevice(opts)
-      
+
       app.config.globalProperties.$device = deviceAPI.deviceInfo
       app.config.globalProperties.$isMobile = deviceAPI.isMobile
       app.config.globalProperties.$isTablet = deviceAPI.isTablet
@@ -63,7 +63,7 @@ export const DevicePlugin: Plugin = {
 
     // 提供全局配置
     app.provide('deviceConfig', opts)
-  }
+  },
 }
 
 /**
@@ -73,7 +73,7 @@ export function createDevicePlugin(options: DevicePluginOptions = {}): Plugin {
   return {
     install(app: App) {
       DevicePlugin.install!(app, options)
-    }
+    },
   }
 }
 
@@ -101,17 +101,17 @@ declare module '@vue/runtime-core' {
 
 /**
  * 插件使用示例
- * 
+ *
  * @example
  * ```typescript
  * import { createApp } from 'vue'
  * import { DevicePlugin } from '@ldesign/device'
- * 
+ *
  * const app = createApp({})
- * 
+ *
  * // 使用默认配置
  * app.use(DevicePlugin)
- * 
+ *
  * // 使用自定义配置
  * app.use(DevicePlugin, {
  *   tabletMinWidth: 600,
@@ -120,33 +120,33 @@ declare module '@vue/runtime-core' {
  *   registerDirectives: true,
  *   componentPrefix: 'My'
  * })
- * 
+ *
  * // 或者使用工厂函数
  * app.use(createDevicePlugin({
  *   enableUserAgentDetection: false
  * }))
  * ```
- * 
+ *
  * @example
  * ```vue
  * <template>
  *   <!-- 使用全局属性 -->
  *   <div v-if="$isMobile">移动端内容</div>
- *   
+ *
  *   <!-- 使用指令 -->
  *   <div v-mobile>移动端内容</div>
  *   <div v-desktop>桌面端内容</div>
- *   
+ *
  *   <!-- 使用组件 -->
  *   <LDeviceProvider>
  *     <YourComponent />
  *   </LDeviceProvider>
  * </template>
- * 
+ *
  * <script setup>
  * // 在组合式 API 中使用
  * import { useDevice } from '@ldesign/device'
- * 
+ *
  * const { deviceInfo, isMobile, isTablet } = useDevice()
  * </script>
  * ```

@@ -90,13 +90,14 @@ export class FeatureDetector {
         // 监听电池状态变化
         if (this.batteryManager) {
           const events = ['chargingchange', 'chargingtimechange', 'dischargingtimechange', 'levelchange']
-          events.forEach(event => {
+          events.forEach((event) => {
             this.batteryManager?.addEventListener(event, () => {
               this.notifyListeners()
             })
           })
         }
-      } catch (error) {
+      }
+ catch (error) {
         console.warn('Battery API not supported:', error)
       }
     }
@@ -106,10 +107,11 @@ export class FeatureDetector {
    * 通知监听器
    */
   private notifyListeners(): void {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener()
-      } catch (error) {
+      }
+ catch (error) {
         console.error('Feature detector listener error:', error)
       }
     })
@@ -118,7 +120,7 @@ export class FeatureDetector {
   /**
    * 获取操作系统信息
    */
-  getOSInfo(): { name: string; version: string } | null {
+  getOSInfo(): { name: string, version: string } | null {
     if (typeof navigator === 'undefined') {
       return null
     }
@@ -161,7 +163,7 @@ export class FeatureDetector {
   /**
    * 获取浏览器信息
    */
-  getBrowserInfo(): { name: string; version: string } | null {
+  getBrowserInfo(): { name: string, version: string } | null {
     if (typeof navigator === 'undefined') {
       return null
     }
@@ -197,8 +199,8 @@ export class FeatureDetector {
   /**
    * 获取硬件信息
    */
-  getHardwareInfo(): { cores?: number; memory?: number; gpu?: string } {
-    const info: { cores?: number; memory?: number; gpu?: string } = {}
+  getHardwareInfo(): { cores?: number, memory?: number, gpu?: string } {
+    const info: { cores?: number, memory?: number, gpu?: string } = {}
 
     if (typeof navigator !== 'undefined') {
       // CPU 核心数
@@ -222,7 +224,8 @@ export class FeatureDetector {
             }
           }
         }
-      } catch (error) {
+      }
+ catch (error) {
         // GPU 信息获取失败
       }
     }
@@ -233,11 +236,11 @@ export class FeatureDetector {
   /**
    * 获取网络信息
    */
-  getNetworkInfo(): { type: string; online: boolean; downlink?: number } {
+  getNetworkInfo(): { type: string, online: boolean, downlink?: number } {
     const info = {
       type: 'unknown',
       online: typeof navigator !== 'undefined' ? navigator.onLine : true,
-      downlink: undefined as number | undefined
+      downlink: undefined as number | undefined,
     }
 
     if (this.networkInfo) {
@@ -251,7 +254,7 @@ export class FeatureDetector {
   /**
    * 获取电池信息
    */
-  getBatteryInfo(): { charging: boolean; level?: number; chargingTime?: number; dischargingTime?: number } | null {
+  getBatteryInfo(): { charging: boolean, level?: number, chargingTime?: number, dischargingTime?: number } | null {
     if (!this.batteryManager) {
       return null
     }
@@ -260,7 +263,7 @@ export class FeatureDetector {
       charging: this.batteryManager.charging,
       level: this.batteryManager.level,
       chargingTime: this.batteryManager.chargingTime === Infinity ? undefined : this.batteryManager.chargingTime,
-      dischargingTime: this.batteryManager.dischargingTime === Infinity ? undefined : this.batteryManager.dischargingTime
+      dischargingTime: this.batteryManager.dischargingTime === Infinity ? undefined : this.batteryManager.dischargingTime,
     }
   }
 

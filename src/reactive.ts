@@ -1,4 +1,4 @@
-import type { DeviceInfo, DeviceChangeEvent, DeviceDetectionConfig } from './types'
+import type { DeviceChangeEvent, DeviceDetectionConfig, DeviceInfo } from './types'
 import { getGlobalDeviceDetector } from './core'
 
 /**
@@ -34,12 +34,12 @@ export class ReactiveDeviceListener {
 
   constructor(options: ReactiveDeviceOptions = {}) {
     this.options = { immediate: true, ...options }
-    
+
     // 初始化状态
     this.state = {
       deviceInfo: {} as DeviceInfo,
       isLoading: true,
-      error: null
+      error: null,
     }
 
     if (this.options.immediate) {
@@ -53,12 +53,12 @@ export class ReactiveDeviceListener {
   private init(): void {
     try {
       const detector = getGlobalDeviceDetector(this.options)
-      
+
       // 获取初始设备信息
       this.updateState({
         deviceInfo: detector.getDeviceInfo(),
         isLoading: false,
-        error: null
+        error: null,
       })
 
       // 监听设备变化
@@ -66,17 +66,18 @@ export class ReactiveDeviceListener {
         this.updateState({
           deviceInfo: event.current,
           isLoading: false,
-          error: null
+          error: null,
         })
       })
-    } catch (error) {
+    }
+ catch (error) {
       const err = error instanceof Error ? error : new Error(String(error))
       this.updateState({
         deviceInfo: {} as DeviceInfo,
         isLoading: false,
-        error: err
+        error: err,
       })
-      
+
       if (this.options.onError) {
         this.options.onError(err)
       }
@@ -95,10 +96,11 @@ export class ReactiveDeviceListener {
    * 通知所有监听器
    */
   private notifyListeners(): void {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(this.state)
-      } catch (error) {
+      }
+ catch (error) {
         console.error('Reactive device listener error:', error)
       }
     })
@@ -116,10 +118,10 @@ export class ReactiveDeviceListener {
    */
   subscribe(listener: (state: ReactiveDeviceState) => void): () => void {
     this.listeners.add(listener)
-    
+
     // 立即触发一次
     listener(this.state)
-    
+
     // 返回取消订阅函数
     return () => {
       this.listeners.delete(listener)
@@ -132,21 +134,23 @@ export class ReactiveDeviceListener {
   refresh(): void {
     if (!this.unsubscribe) {
       this.init()
-    } else {
+    }
+ else {
       try {
         const detector = getGlobalDeviceDetector(this.options)
         this.updateState({
           deviceInfo: detector.getDeviceInfo(),
           isLoading: false,
-          error: null
+          error: null,
         })
-      } catch (error) {
+      }
+ catch (error) {
         const err = error instanceof Error ? error : new Error(String(error))
         this.updateState({
           error: err,
-          isLoading: false
+          isLoading: false,
         })
-        
+
         if (this.options.onError) {
           this.options.onError(err)
         }
@@ -162,7 +166,7 @@ export class ReactiveDeviceListener {
       this.unsubscribe()
       this.unsubscribe = null
     }
-    
+
     this.listeners.clear()
   }
 }
@@ -171,7 +175,7 @@ export class ReactiveDeviceListener {
  * 创建响应式设备监听器
  */
 export function createReactiveDeviceListener(
-  options?: ReactiveDeviceOptions
+  options?: ReactiveDeviceOptions,
 ): ReactiveDeviceListener {
   return new ReactiveDeviceListener(options)
 }
@@ -181,7 +185,7 @@ export function createReactiveDeviceListener(
  */
 export function useDeviceInfo(options?: ReactiveDeviceOptions) {
   const listener = createReactiveDeviceListener(options)
-  
+
   return {
     /** 获取当前状态 */
     getState: () => listener.getState(),
@@ -190,7 +194,7 @@ export function useDeviceInfo(options?: ReactiveDeviceOptions) {
     /** 刷新设备信息 */
     refresh: () => listener.refresh(),
     /** 销毁监听器 */
-    destroy: () => listener.destroy()
+    destroy: () => listener.destroy(),
   }
 }
 
@@ -225,7 +229,8 @@ export class MediaQueryListener {
 
     if (this.mediaQuery.addEventListener) {
       this.mediaQuery.addEventListener('change', handler)
-    } else {
+    }
+ else {
       // 兼容旧版本
       this.mediaQuery.addListener(handler)
     }
@@ -235,10 +240,11 @@ export class MediaQueryListener {
    * 通知所有监听器
    */
   private notifyListeners(): void {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(this.currentMatches)
-      } catch (error) {
+      }
+ catch (error) {
         console.error('Media query listener error:', error)
       }
     })
@@ -256,10 +262,10 @@ export class MediaQueryListener {
    */
   subscribe(listener: (matches: boolean) => void): () => void {
     this.listeners.add(listener)
-    
+
     // 立即触发一次
     listener(this.currentMatches)
-    
+
     // 返回取消订阅函数
     return () => {
       this.listeners.delete(listener)
@@ -303,5 +309,5 @@ export const MEDIA_QUERIES = {
   /** 浅色模式 */
   lightMode: '(prefers-color-scheme: light)',
   /** 减少动画 */
-  reducedMotion: '(prefers-reduced-motion: reduce)'
+  reducedMotion: '(prefers-reduced-motion: reduce)',
 } as const

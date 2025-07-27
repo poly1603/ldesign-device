@@ -1,18 +1,18 @@
-import type { 
-  DeviceInfo, 
-  DeviceDetectionConfig, 
-  DeviceChangeEvent, 
-  DeviceDetector 
+import type {
+  DeviceChangeEvent,
+  DeviceDetectionConfig,
+  DeviceDetector,
+  DeviceInfo,
 } from '../types'
 import { DEFAULT_DEVICE_CONFIG } from '../types'
 import {
-  getScreenSize,
-  getPixelRatio,
-  isTouchDevice,
-  getUserAgent,
+  debounce,
   detectDeviceType,
+  getPixelRatio,
   getScreenOrientation,
-  debounce
+  getScreenSize,
+  getUserAgent,
+  isTouchDevice,
 } from '../utils'
 
 /**
@@ -64,7 +64,7 @@ export class DeviceDetectorImpl implements DeviceDetector {
       height,
       pixelRatio,
       isTouchDevice: isTouchDev,
-      userAgent
+      userAgent,
     }
   }
 
@@ -87,11 +87,12 @@ export class DeviceDetectorImpl implements DeviceDetector {
 
     // 监听屏幕方向变化
     this.orientationHandler = debouncedUpdate
-    
+
     // 优先使用 Screen Orientation API
     if (screen.orientation) {
       screen.orientation.addEventListener('change', this.orientationHandler)
-    } else {
+    }
+ else {
       // 回退到 orientationchange 事件
       window.addEventListener('orientationchange', this.orientationHandler)
     }
@@ -110,17 +111,17 @@ export class DeviceDetectorImpl implements DeviceDetector {
 
     // 检查是否有变化
     const changes = this.getChanges(previousInfo, newInfo)
-    
+
     if (changes.length > 0) {
       this.currentDeviceInfo = newInfo
-      
+
       // 触发变化事件
       const event: DeviceChangeEvent = {
         current: newInfo,
         previous: previousInfo,
-        changes
+        changes,
       }
-      
+
       this.notifyListeners(event)
     }
   }
@@ -129,8 +130,8 @@ export class DeviceDetectorImpl implements DeviceDetector {
    * 获取变化的属性
    */
   private getChanges(
-    previous: DeviceInfo | null, 
-    current: DeviceInfo
+    previous: DeviceInfo | null,
+    current: DeviceInfo,
   ): Array<keyof DeviceInfo> {
     if (!previous) {
       return []
@@ -152,10 +153,11 @@ export class DeviceDetectorImpl implements DeviceDetector {
    * 通知所有监听器
    */
   private notifyListeners(event: DeviceChangeEvent): void {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(event)
-      } catch (error) {
+      }
+ catch (error) {
         console.error('Device change listener error:', error)
       }
     })
@@ -176,7 +178,7 @@ export class DeviceDetectorImpl implements DeviceDetector {
    */
   onDeviceChange(callback: (event: DeviceChangeEvent) => void): () => void {
     this.listeners.push(callback)
-    
+
     // 返回取消监听的函数
     return () => {
       const index = this.listeners.indexOf(callback)
@@ -201,11 +203,12 @@ export class DeviceDetectorImpl implements DeviceDetector {
       if (this.resizeHandler) {
         window.removeEventListener('resize', this.resizeHandler)
       }
-      
+
       if (this.orientationHandler) {
         if (screen.orientation) {
           screen.orientation.removeEventListener('change', this.orientationHandler)
-        } else {
+        }
+ else {
           window.removeEventListener('orientationchange', this.orientationHandler)
         }
       }
@@ -253,7 +256,7 @@ export function getDeviceInfo(config?: DeviceDetectionConfig): DeviceInfo {
  */
 export function onDeviceChange(
   callback: (event: DeviceChangeEvent) => void,
-  config?: DeviceDetectionConfig
+  config?: DeviceDetectionConfig,
 ): () => void {
   return getGlobalDeviceDetector(config).onDeviceChange(callback)
 }

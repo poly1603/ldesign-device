@@ -5,7 +5,7 @@ import { useDevice, useDeviceType, useOrientation } from '../vue'
 import type {
   AdapterConfig,
   AdapterFactory,
-  FullFrameworkAdapter
+  FullFrameworkAdapter,
 } from './types'
 import { BaseAdapter } from './types'
 
@@ -71,16 +71,16 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
       props: {
         detailed: {
           type: Boolean,
-          default: false
+          default: false,
         },
         showLoading: {
           type: Boolean,
-          default: true
+          default: true,
         },
         config: {
           type: Object,
-          default: () => ({})
-        }
+          default: () => ({}),
+        },
       },
       setup(props: any) {
         const { deviceInfo, isLoading, error } = useDevice(props.config)
@@ -88,7 +88,7 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
         return {
           deviceInfo,
           isLoading,
-          error
+          error,
         }
       },
       template: `
@@ -124,7 +124,7 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
             </div>
           </div>
         </div>
-      `
+      `,
     }
   }
 
@@ -137,8 +137,8 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
       props: {
         config: {
           type: Object,
-          default: () => ({})
-        }
+          default: () => ({}),
+        },
       },
       setup(props: any, { slots }: any) {
         const deviceContext = useDevice(props.config)
@@ -147,7 +147,7 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
         provide(DEVICE_CONTEXT_KEY, deviceContext)
 
         return () => slots.default?.()
-      }
+      },
     }
   }
 
@@ -155,7 +155,8 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
    * 注册设备相关指令
    */
   registerDirectives(): void {
-    if (!this.app) return
+    if (!this.app)
+return
 
     // v-device 指令 - 根据设备类型显示/隐藏
     this.app.directive('device', this.createDeviceDirective())
@@ -202,7 +203,7 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
         if (el._deviceDirectiveUpdate) {
           delete el._deviceDirectiveUpdate
         }
-      }
+      },
     }
   }
 
@@ -255,7 +256,7 @@ export class Vue3Adapter extends BaseAdapter implements FullFrameworkAdapter {
         if (el._conditionalDirectiveUpdate) {
           delete el._conditionalDirectiveUpdate
         }
-      }
+      },
     }
   }
 
@@ -285,7 +286,8 @@ export class Vue3AdapterFactory implements AdapterFactory {
 
       const vue = (window as any).Vue
       return vue && vue.version && vue.version.startsWith('3.')
-    } catch {
+    }
+ catch {
       return false
     }
   }
@@ -303,7 +305,7 @@ export function createVue3Plugin(options: AdapterConfig = {}): Plugin {
     install(app: App) {
       const adapter = new Vue3Adapter()
       adapter.install(app, options)
-    }
+    },
   }
 }
 

@@ -75,20 +75,6 @@ unsubscribe()
 ### Composition API
 
 ```vue
-<template>
-  <div>
-    <h2>设备信息</h2>
-    <p>设备类型: {{ deviceInfo.type }}</p>
-    <p>屏幕方向: {{ deviceInfo.orientation }}</p>
-    <p>屏幕尺寸: {{ deviceInfo.width }} x {{ deviceInfo.height }}</p>
-    
-    <!-- 条件渲染 -->
-    <div v-if="isMobile">📱 移动端专用内容</div>
-    <div v-else-if="isTablet">📱 平板专用内容</div>
-    <div v-else>💻 桌面端专用内容</div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { useDevice } from '@ldesign/device'
 
@@ -101,6 +87,26 @@ const {
   isLandscape
 } = useDevice()
 </script>
+
+<template>
+  <div>
+    <h2>设备信息</h2>
+    <p>设备类型: {{ deviceInfo.type }}</p>
+    <p>屏幕方向: {{ deviceInfo.orientation }}</p>
+    <p>屏幕尺寸: {{ deviceInfo.width }} x {{ deviceInfo.height }}</p>
+
+    <!-- 条件渲染 -->
+    <div v-if="isMobile">
+      📱 移动端专用内容
+    </div>
+    <div v-else-if="isTablet">
+      📱 平板专用内容
+    </div>
+    <div v-else>
+      💻 桌面端专用内容
+    </div>
+  </div>
+</template>
 ```
 
 ### 使用插件
@@ -108,8 +114,8 @@ const {
 ```typescript
 // main.ts
 import { createApp } from 'vue'
-import { DevicePlugin } from '@ldesign/device'
 import App from './App.vue'
+import { DevicePlugin } from '@ldesign/device'
 
 const app = createApp(App)
 
@@ -128,9 +134,15 @@ app.mount('#app')
 ```vue
 <template>
   <div>
-    <p v-if="$isMobile">移动设备</p>
-    <p v-if="$isTablet">平板设备</p>
-    <p v-if="$isDesktop">桌面设备</p>
+    <p v-if="$isMobile">
+      移动设备
+    </p>
+    <p v-if="$isTablet">
+      平板设备
+    </p>
+    <p v-if="$isDesktop">
+      桌面设备
+    </p>
   </div>
 </template>
 ```
@@ -141,21 +153,35 @@ app.mount('#app')
 <template>
   <div>
     <!-- 仅在移动设备显示 -->
-    <div v-mobile>📱 移动端导航</div>
-    
+    <div v-mobile>
+      📱 移动端导航
+    </div>
+
     <!-- 仅在非移动设备显示 -->
-    <div v-mobile.not>💻 桌面端导航</div>
-    
+    <div v-mobile.not>
+      💻 桌面端导航
+    </div>
+
     <!-- 根据设备类型显示 -->
-    <div v-device="'mobile'">移动端</div>
-    <div v-device="['tablet', 'desktop']">平板或桌面</div>
-    
+    <div v-device="'mobile'">
+      移动端
+    </div>
+    <div v-device="['tablet', 'desktop']">
+      平板或桌面
+    </div>
+
     <!-- 根据方向显示 -->
-    <div v-portrait>竖屏内容</div>
-    <div v-landscape>横屏内容</div>
-    
+    <div v-portrait>
+      竖屏内容
+    </div>
+    <div v-landscape>
+      横屏内容
+    </div>
+
     <!-- 触摸设备专用 -->
-    <div v-touch>触摸设备内容</div>
+    <div v-touch>
+      触摸设备内容
+    </div>
   </div>
 </template>
 ```
@@ -163,15 +189,15 @@ app.mount('#app')
 ### 使用 Provider
 
 ```vue
+<script setup>
+import { DeviceProvider } from '@ldesign/device'
+</script>
+
 <template>
   <DeviceProvider :config="{ tabletMinWidth: 600 }">
     <router-view />
   </DeviceProvider>
 </template>
-
-<script setup>
-import { DeviceProvider } from '@ldesign/device'
-</script>
 ```
 
 在子组件中使用上下文：
@@ -192,13 +218,13 @@ import { getDeviceInfo } from '@ldesign/device'
 const deviceInfo = getDeviceInfo({
   // 平板设备的最小宽度阈值 (px)
   tabletMinWidth: 768,
-  
-  // 桌面设备的最小宽度阈值 (px)  
+
+  // 桌面设备的最小宽度阈值 (px)
   desktopMinWidth: 1024,
-  
+
   // 是否启用用户代理检测
   enableUserAgentDetection: true,
-  
+
   // 是否启用触摸检测
   enableTouchDetection: true
 })
@@ -209,17 +235,11 @@ const deviceInfo = getDeviceInfo({
 ### 响应式布局
 
 ```vue
-<template>
-  <div :class="containerClass">
-    <component :is="currentComponent" />
-  </div>
-</template>
-
 <script setup>
 import { computed } from 'vue'
-import { useDevice } from '@ldesign/device'
 import MobileLayout from './MobileLayout.vue'
 import DesktopLayout from './DesktopLayout.vue'
+import { useDevice } from '@ldesign/device'
 
 const { isMobile, isTablet } = useDevice()
 
@@ -233,15 +253,17 @@ const containerClass = computed(() => ({
   'container-desktop': !isMobile.value && !isTablet.value
 }))
 </script>
+
+<template>
+  <div :class="containerClass">
+    <component :is="currentComponent" />
+  </div>
+</template>
 ```
 
 ### 图片优化
 
 ```vue
-<template>
-  <img :src="optimizedImageUrl" :alt="alt" />
-</template>
-
 <script setup>
 import { computed } from 'vue'
 import { useDevice } from '@ldesign/device'
@@ -256,14 +278,18 @@ const { isMobile, deviceInfo } = useDevice()
 const optimizedImageUrl = computed(() => {
   const { src } = props
   const isHighDPI = deviceInfo.value.pixelRatio > 1
-  
+
   if (isMobile.value) {
     return isHighDPI ? `${src}@2x-mobile.jpg` : `${src}-mobile.jpg`
   }
-  
+
   return isHighDPI ? `${src}@2x.jpg` : `${src}.jpg`
 })
 </script>
+
+<template>
+  <img :src="optimizedImageUrl" :alt="alt">
+</template>
 ```
 
 ## 🔍 调试技巧

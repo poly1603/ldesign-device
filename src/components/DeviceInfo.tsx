@@ -22,24 +22,24 @@ export const DeviceInfo = defineComponent({
   props: {
     config: {
       type: Object as PropType<DeviceDetectionConfig>,
-      default: () => ({})
+      default: () => ({}),
     },
     detailed: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showLoading: {
       type: Boolean,
-      default: true
+      default: true,
     },
     className: {
       type: String,
-      default: ''
+      default: '',
     },
     style: {
       type: Object as PropType<Record<string, any>>,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   setup(props) {
     const {
@@ -51,14 +51,17 @@ export const DeviceInfo = defineComponent({
       isDesktop,
       isPortrait,
       isLandscape,
-      isTouchDevice
+      isTouchDevice,
     } = useDevice(props.config)
 
     // 设备类型图标
     const deviceIcon = computed(() => {
-      if (isMobile.value) return '📱'
-      if (isTablet.value) return '📱'
-      if (isDesktop.value) return '💻'
+      if (isMobile.value)
+return '📱'
+      if (isTablet.value)
+return '📱'
+      if (isDesktop.value)
+return '💻'
       return '❓'
     })
 
@@ -72,7 +75,7 @@ export const DeviceInfo = defineComponent({
       const labels = {
         mobile: '移动设备',
         tablet: '平板设备',
-        desktop: '桌面设备'
+        desktop: '桌面设备',
       }
       return labels[deviceInfo.value.type] || '未知设备'
     })
@@ -81,7 +84,7 @@ export const DeviceInfo = defineComponent({
     const orientationLabel = computed(() => {
       const labels = {
         portrait: '竖屏',
-        landscape: '横屏'
+        landscape: '横屏',
       }
       return labels[deviceInfo.value.orientation] || '未知方向'
     })
@@ -99,7 +102,7 @@ export const DeviceInfo = defineComponent({
       deviceIcon,
       orientationIcon,
       deviceTypeLabel,
-      orientationLabel
+      orientationLabel,
     }
   },
   render() {
@@ -115,7 +118,7 @@ export const DeviceInfo = defineComponent({
       orientationIcon,
       deviceTypeLabel,
       orientationLabel,
-      isTouchDevice
+      isTouchDevice,
     } = this
 
     const classes = [
@@ -124,8 +127,8 @@ export const DeviceInfo = defineComponent({
       {
         'ldesign-device-info--loading': isLoading,
         'ldesign-device-info--error': error,
-        'ldesign-device-info--detailed': detailed
-      }
+        'ldesign-device-info--detailed': detailed,
+      },
     ]
 
     // 加载状态
@@ -147,7 +150,9 @@ export const DeviceInfo = defineComponent({
           <div class="ldesign-device-info__error">
             <span class="ldesign-device-info__error-icon">⚠️</span>
             <span class="ldesign-device-info__error-message">
-              设备检测失败: {error.message}
+              设备检测失败:
+{' '}
+{error.message}
             </span>
           </div>
         </div>
@@ -171,18 +176,25 @@ export const DeviceInfo = defineComponent({
     )
 
     // 详细信息
-    const detailedInfo = detailed ? (
+    const detailedInfo = detailed
+? (
       <div class="ldesign-device-info__detailed">
         <div class="ldesign-device-info__section">
           <h4 class="ldesign-device-info__section-title">屏幕信息</h4>
           <div class="ldesign-device-info__grid">
             <div class="ldesign-device-info__item">
               <span class="ldesign-device-info__label">宽度:</span>
-              <span class="ldesign-device-info__value">{deviceInfo.width}px</span>
+              <span class="ldesign-device-info__value">
+{deviceInfo.width}
+px
+              </span>
             </div>
             <div class="ldesign-device-info__item">
               <span class="ldesign-device-info__label">高度:</span>
-              <span class="ldesign-device-info__value">{deviceInfo.height}px</span>
+              <span class="ldesign-device-info__value">
+{deviceInfo.height}
+px
+              </span>
             </div>
             <div class="ldesign-device-info__item">
               <span class="ldesign-device-info__label">像素比:</span>
@@ -204,7 +216,8 @@ export const DeviceInfo = defineComponent({
           </div>
         </div>
       </div>
-    ) : null
+    )
+: null
 
     return (
       <div class={classes} style={style}>
@@ -212,7 +225,7 @@ export const DeviceInfo = defineComponent({
         {detailedInfo}
       </div>
     )
-  }
+  },
 })
 
 export default DeviceInfo

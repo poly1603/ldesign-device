@@ -12,12 +12,12 @@ app.use(DevicePlugin, {
   desktopMinWidth: 1024,
   enableUserAgentDetection: true,
   enableTouchDetection: true,
-  
+
   // 插件选项
   registerComponents: true,
   registerDirectives: true,
   registerGlobalProperties: true,
-  componentPrefix: 'L'
+  componentPrefix: 'L',
 })
 
 app.mount('#app')

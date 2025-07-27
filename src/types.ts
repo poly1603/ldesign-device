@@ -7,7 +7,7 @@ export enum DeviceType {
   /** 平板设备 */
   TABLET = 'tablet',
   /** 移动设备 */
-  MOBILE = 'mobile'
+  MOBILE = 'mobile',
 }
 
 /**
@@ -17,7 +17,7 @@ export enum Orientation {
   /** 竖屏 */
   PORTRAIT = 'portrait',
   /** 横屏 */
-  LANDSCAPE = 'landscape'
+  LANDSCAPE = 'landscape',
 }
 
 /**
@@ -106,11 +106,11 @@ export interface DeviceChangeEvent {
  */
 export interface DeviceDetector {
   /** 获取当前设备信息 */
-  getDeviceInfo(): DeviceInfo
+  getDeviceInfo: () => DeviceInfo
   /** 监听设备变化 */
-  onDeviceChange(callback: (event: DeviceChangeEvent) => void): () => void
+  onDeviceChange: (callback: (event: DeviceChangeEvent) => void) => () => void
   /** 销毁检测器 */
-  destroy(): void
+  destroy: () => void
 }
 
 /**
@@ -154,7 +154,7 @@ export const DEFAULT_DEVICE_CONFIG: Required<DeviceDetectionConfig> = {
   tabletMinWidth: 768,
   desktopMinWidth: 1024,
   enableUserAgentDetection: true,
-  enableTouchDetection: true
+  enableTouchDetection: true,
 }
 
 /**

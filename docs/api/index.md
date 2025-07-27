@@ -214,7 +214,7 @@ function detectDeviceType(
 获取当前屏幕尺寸。
 
 ```typescript
-function getScreenSize(): { width: number; height: number }
+function getScreenSize(): { width: number, height: number }
 ```
 
 ### isTouchDevice()
@@ -233,13 +233,13 @@ function isTouchDevice(): boolean
 
 ```typescript
 interface DeviceInfo {
-  type: DeviceType                // 设备类型
-  orientation: Orientation        // 屏幕方向
-  width: number                   // 屏幕宽度
-  height: number                  // 屏幕高度
-  pixelRatio: number             // 设备像素比
-  isTouchDevice: boolean         // 是否触摸设备
-  userAgent: string              // 用户代理字符串
+  type: DeviceType // 设备类型
+  orientation: Orientation // 屏幕方向
+  width: number // 屏幕宽度
+  height: number // 屏幕高度
+  pixelRatio: number // 设备像素比
+  isTouchDevice: boolean // 是否触摸设备
+  userAgent: string // 用户代理字符串
 }
 ```
 
@@ -249,9 +249,9 @@ interface DeviceInfo {
 
 ```typescript
 enum DeviceType {
-  DESKTOP = 'desktop',  // 桌面设备
-  TABLET = 'tablet',    // 平板设备
-  MOBILE = 'mobile'     // 移动设备
+  DESKTOP = 'desktop', // 桌面设备
+  TABLET = 'tablet', // 平板设备
+  MOBILE = 'mobile' // 移动设备
 }
 ```
 
@@ -261,8 +261,8 @@ enum DeviceType {
 
 ```typescript
 enum Orientation {
-  PORTRAIT = 'portrait',    // 竖屏
-  LANDSCAPE = 'landscape'   // 横屏
+  PORTRAIT = 'portrait', // 竖屏
+  LANDSCAPE = 'landscape' // 横屏
 }
 ```
 
@@ -272,10 +272,10 @@ enum Orientation {
 
 ```typescript
 interface DeviceDetectionConfig {
-  tabletMinWidth?: number              // 平板最小宽度 (默认: 768)
-  desktopMinWidth?: number             // 桌面最小宽度 (默认: 1024)
-  enableUserAgentDetection?: boolean   // 启用UA检测 (默认: true)
-  enableTouchDetection?: boolean       // 启用触摸检测 (默认: true)
+  tabletMinWidth?: number // 平板最小宽度 (默认: 768)
+  desktopMinWidth?: number // 桌面最小宽度 (默认: 1024)
+  enableUserAgentDetection?: boolean // 启用UA检测 (默认: true)
+  enableTouchDetection?: boolean // 启用触摸检测 (默认: true)
 }
 ```
 
@@ -287,10 +287,14 @@ interface DeviceDetectionConfig {
 
 ```vue
 <!-- 单个设备类型 -->
-<div v-device="'mobile'">移动端内容</div>
+<div v-device="'mobile'">
+移动端内容
+</div>
 
 <!-- 多个设备类型 -->
-<div v-device="['tablet', 'desktop']">平板或桌面内容</div>
+<div v-device="['tablet', 'desktop']">
+平板或桌面内容
+</div>
 ```
 
 ### v-mobile / v-tablet / v-desktop
@@ -298,12 +302,22 @@ interface DeviceDetectionConfig {
 设备类型专用指令。
 
 ```vue
-<div v-mobile>仅移动端显示</div>
-<div v-tablet>仅平板显示</div>
-<div v-desktop>仅桌面显示</div>
+<div v-mobile>
+仅移动端显示
+</div>
+
+<div v-tablet>
+仅平板显示
+</div>
+
+<div v-desktop>
+仅桌面显示
+</div>
 
 <!-- 支持取反 -->
-<div v-mobile.not>非移动端显示</div>
+<div v-mobile.not>
+非移动端显示
+</div>
 ```
 
 ### v-portrait / v-landscape
@@ -311,8 +325,13 @@ interface DeviceDetectionConfig {
 屏幕方向指令。
 
 ```vue
-<div v-portrait>竖屏内容</div>
-<div v-landscape>横屏内容</div>
+<div v-portrait>
+竖屏内容
+</div>
+
+<div v-landscape>
+横屏内容
+</div>
 ```
 
 ### v-touch
@@ -320,8 +339,13 @@ interface DeviceDetectionConfig {
 触摸设备指令。
 
 ```vue
-<div v-touch>触摸设备专用内容</div>
-<div v-touch.not>非触摸设备内容</div>
+<div v-touch>
+触摸设备专用内容
+</div>
+
+<div v-touch.not>
+非触摸设备内容
+</div>
 ```
 
 ## 📚 更多文档

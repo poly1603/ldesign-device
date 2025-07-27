@@ -1,3 +1,33 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useDevice } from '@ldesign/device'
+
+const { isMobile, isTablet, isDesktop } = useDevice()
+
+const showMobileMenu = ref(false)
+
+const headerClass = computed(() => ({
+  'header-mobile': isMobile.value,
+  'header-tablet': isTablet.value,
+  'header-desktop': isDesktop.value,
+}))
+
+const containerClass = computed(() => ({
+  'container': true,
+  'container-mobile': isMobile.value,
+  'container-tablet': isTablet.value,
+  'container-desktop': isDesktop.value,
+}))
+
+function toggleMobileMenu() {
+  showMobileMenu.value = !showMobileMenu.value
+}
+
+function closeMobileMenu() {
+  showMobileMenu.value = false
+}
+</script>
+
 <template>
   <header class="header" :class="headerClass">
     <div :class="containerClass">
@@ -7,7 +37,7 @@
           <h1>📱 Device Demo</h1>
           <span class="version">v1.0.0</span>
         </div>
-        
+
         <!-- 桌面导航 -->
         <nav v-desktop class="nav-desktop">
           <ul class="nav-links">
@@ -18,23 +48,23 @@
             <li><a href="#performance">性能优化</a></li>
           </ul>
         </nav>
-        
+
         <!-- 移动端菜单按钮 -->
-        <button 
-          v-mobile 
+        <button
+          v-mobile
           class="menu-toggle"
-          @click="toggleMobileMenu"
           :class="{ active: showMobileMenu }"
+          @click="toggleMobileMenu"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span />
+          <span />
+          <span />
         </button>
       </div>
-      
+
       <!-- 移动端导航菜单 -->
-      <nav 
-        v-mobile 
+      <nav
+        v-mobile
         class="nav-mobile"
         :class="{ show: showMobileMenu }"
       >
@@ -49,36 +79,6 @@
     </div>
   </header>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useDevice } from '@ldesign/device'
-
-const { isMobile, isTablet, isDesktop } = useDevice()
-
-const showMobileMenu = ref(false)
-
-const headerClass = computed(() => ({
-  'header-mobile': isMobile.value,
-  'header-tablet': isTablet.value,
-  'header-desktop': isDesktop.value
-}))
-
-const containerClass = computed(() => ({
-  'container': true,
-  'container-mobile': isMobile.value,
-  'container-tablet': isTablet.value,
-  'container-desktop': isDesktop.value
-}))
-
-const toggleMobileMenu = () => {
-  showMobileMenu.value = !showMobileMenu.value
-}
-
-const closeMobileMenu = () => {
-  showMobileMenu.value = false
-}
-</script>
 
 <style scoped>
 .header {

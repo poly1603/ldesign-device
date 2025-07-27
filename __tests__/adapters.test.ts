@@ -1,28 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   AdapterRegistryImpl,
-  detectAdapter,
   FrameworkDetector,
+  Vue3AdapterFactory,
+  detectAdapter,
   getAdapter,
   globalAdapterRegistry,
   registerAdapter,
-  Vue3AdapterFactory
 } from '../src/adapters'
 import type { AdapterFactory } from '../src/adapters/types'
 
-describe('AdapterRegistry', () => {
+describe('adapterRegistry', () => {
   let registry: AdapterRegistryImpl
 
   beforeEach(() => {
     registry = new AdapterRegistryImpl()
   })
 
-  describe('AdapterRegistryImpl', () => {
+  describe('adapterRegistryImpl', () => {
     it('should register and get adapters', () => {
       const mockFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registry.register('test', mockFactory)
@@ -35,13 +35,13 @@ describe('AdapterRegistry', () => {
       const factory1: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       const factory2: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['2.0.0'])
+        getSupportedVersions: vi.fn(() => ['2.0.0']),
       }
 
       registry.register('adapter1', factory1)
@@ -57,13 +57,13 @@ describe('AdapterRegistry', () => {
       const compatibleFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       const incompatibleFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => false),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registry.register('compatible', compatibleFactory)
@@ -72,7 +72,7 @@ describe('AdapterRegistry', () => {
       // Mock FrameworkDetector
       vi.spyOn(FrameworkDetector, 'detect').mockReturnValue([
         { name: 'compatible', version: '1.0.0', supported: true, confidence: 0.9 },
-        { name: 'incompatible', version: '1.0.0', supported: false, confidence: 0.8 }
+        { name: 'incompatible', version: '1.0.0', supported: false, confidence: 0.8 },
       ])
 
       const detected = registry.detect()
@@ -83,7 +83,7 @@ describe('AdapterRegistry', () => {
       const mockFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registry.register('test', mockFactory)
@@ -97,7 +97,7 @@ describe('AdapterRegistry', () => {
       const factory1: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registry.register('vue3', factory1)
@@ -111,7 +111,7 @@ describe('AdapterRegistry', () => {
       const compatibleFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registry.register('vue3', compatibleFactory)
@@ -121,7 +121,7 @@ describe('AdapterRegistry', () => {
     })
   })
 
-  describe('Global Registry Functions', () => {
+  describe('global Registry Functions', () => {
     beforeEach(() => {
       globalAdapterRegistry.clear()
     })
@@ -130,7 +130,7 @@ describe('AdapterRegistry', () => {
       const mockFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registerAdapter('test', mockFactory)
@@ -141,14 +141,14 @@ describe('AdapterRegistry', () => {
       const mockFactory: AdapterFactory = {
         create: vi.fn(),
         isCompatible: vi.fn(() => true),
-        getSupportedVersions: vi.fn(() => ['1.0.0'])
+        getSupportedVersions: vi.fn(() => ['1.0.0']),
       }
 
       registerAdapter('vue3', mockFactory)
 
       // Mock FrameworkDetector
       vi.spyOn(FrameworkDetector, 'detect').mockReturnValue([
-        { name: 'vue3', version: '3.0.0', supported: true, confidence: 0.9 }
+        { name: 'vue3', version: '3.0.0', supported: true, confidence: 0.9 },
       ])
 
       const detected = detectAdapter()
@@ -156,7 +156,7 @@ describe('AdapterRegistry', () => {
     })
   })
 
-  describe('FrameworkDetector', () => {
+  describe('frameworkDetector', () => {
     beforeEach(() => {
       // 清理全局对象
       delete (globalThis as any).window
@@ -168,8 +168,8 @@ describe('AdapterRegistry', () => {
       // Mock Vue 3 environment
       ; (globalThis as any).window = {
         Vue: {
-          version: '3.4.0'
-        }
+          version: '3.4.0',
+        },
       }
 
       const results = FrameworkDetector.detect()
@@ -185,8 +185,8 @@ describe('AdapterRegistry', () => {
       // Mock Vue 2 environment
       ; (globalThis as any).window = {
         Vue: {
-          version: '2.7.0'
-        }
+          version: '2.7.0',
+        },
       }
 
       const results = FrameworkDetector.detect()
@@ -202,8 +202,8 @@ describe('AdapterRegistry', () => {
       // Mock React environment
       ; (globalThis as any).window = {
         React: {
-          version: '18.0.0'
-        }
+          version: '18.0.0',
+        },
       }
 
       const results = FrameworkDetector.detect()
@@ -227,7 +227,7 @@ describe('AdapterRegistry', () => {
       // Mock multiple frameworks
       ; (globalThis as any).window = {
         Vue: { version: '3.4.0' },
-        React: { version: '18.0.0' }
+        React: { version: '18.0.0' },
       }
 
       const bestMatch = FrameworkDetector.getBestMatch()
@@ -243,7 +243,7 @@ describe('AdapterRegistry', () => {
     })
   })
 
-  describe('Vue3AdapterFactory', () => {
+  describe('vue3AdapterFactory', () => {
     let factory: Vue3AdapterFactory
 
     beforeEach(() => {
@@ -260,8 +260,8 @@ describe('AdapterRegistry', () => {
       // Mock Vue 3 environment
       ; (globalThis as any).window = {
         Vue: {
-          version: '3.4.0'
-        }
+          version: '3.4.0',
+        },
       }
 
       expect(factory.isCompatible()).toBe(true)

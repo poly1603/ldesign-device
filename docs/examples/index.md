@@ -20,11 +20,11 @@ console.log('屏幕尺寸:', `${deviceInfo.width}x${deviceInfo.height}`)
 // 监听设备变化
 const unsubscribe = onDeviceChange((event) => {
   console.log('设备信息变化:', event.changes)
-  
+
   if (event.changes.includes('type')) {
     console.log('设备类型变化:', event.current.type)
   }
-  
+
   if (event.changes.includes('orientation')) {
     console.log('屏幕方向变化:', event.current.orientation)
   }
@@ -41,40 +41,6 @@ const unsubscribe = onDeviceChange((event) => {
 <div class="example-container">
 
 ```vue
-<template>
-  <div class="responsive-layout" :class="layoutClass">
-    <header class="header">
-      <h1>{{ title }}</h1>
-      <nav v-if="!isMobile" class="desktop-nav">
-        <a href="#home">首页</a>
-        <a href="#about">关于</a>
-        <a href="#contact">联系</a>
-      </nav>
-      <button v-else class="mobile-menu-btn" @click="toggleMenu">
-        ☰
-      </button>
-    </header>
-    
-    <main class="main">
-      <div class="content-grid">
-        <article 
-          v-for="item in items" 
-          :key="item.id"
-          class="content-item"
-        >
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.description }}</p>
-        </article>
-      </div>
-    </main>
-    
-    <aside v-if="!isMobile" class="sidebar">
-      <h3>侧边栏</h3>
-      <p>桌面端专用侧边栏内容</p>
-    </aside>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useDevice } from '@ldesign/device'
@@ -82,8 +48,10 @@ import { useDevice } from '@ldesign/device'
 const { deviceInfo, isMobile, isTablet, isDesktop } = useDevice()
 
 const title = computed(() => {
-  if (isMobile.value) return '移动版'
-  if (isTablet.value) return '平板版'
+  if (isMobile.value)
+return '移动版'
+  if (isTablet.value)
+return '平板版'
   return '桌面版'
 })
 
@@ -100,10 +68,44 @@ const items = ref([
 ])
 
 const showMobileMenu = ref(false)
-const toggleMenu = () => {
+function toggleMenu() {
   showMobileMenu.value = !showMobileMenu.value
 }
 </script>
+
+<template>
+  <div class="responsive-layout" :class="layoutClass">
+    <header class="header">
+      <h1>{{ title }}</h1>
+      <nav v-if="!isMobile" class="desktop-nav">
+        <a href="#home">首页</a>
+        <a href="#about">关于</a>
+        <a href="#contact">联系</a>
+      </nav>
+      <button v-else class="mobile-menu-btn" @click="toggleMenu">
+        ☰
+      </button>
+    </header>
+
+    <main class="main">
+      <div class="content-grid">
+        <article
+          v-for="item in items"
+          :key="item.id"
+          class="content-item"
+        >
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </article>
+      </div>
+    </main>
+
+    <aside v-if="!isMobile" class="sidebar">
+      <h3>侧边栏</h3>
+      <p>桌面端专用侧边栏内容</p>
+    </aside>
+  </div>
+</template>
 
 <style scoped>
 .responsive-layout {
@@ -115,7 +117,7 @@ const toggleMenu = () => {
 .layout-desktop {
   grid-template-columns: 1fr 300px;
   grid-template-rows: auto 1fr;
-  grid-template-areas: 
+  grid-template-areas:
     "header header"
     "main sidebar";
 }
@@ -124,7 +126,7 @@ const toggleMenu = () => {
 .layout-tablet {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
-  grid-template-areas: 
+  grid-template-areas:
     "header"
     "main";
 }
@@ -133,7 +135,7 @@ const toggleMenu = () => {
 .layout-mobile {
   grid-template-columns: 1fr;
   grid-template-rows: auto 1fr;
-  grid-template-areas: 
+  grid-template-areas:
     "header"
     "main";
 }
@@ -212,39 +214,39 @@ const toggleMenu = () => {
     <div v-mobile class="mobile-only">
       📱 这个内容只在移动设备显示
     </div>
-    
+
     <div v-tablet class="tablet-only">
       📱 这个内容只在平板设备显示
     </div>
-    
+
     <div v-desktop class="desktop-only">
       💻 这个内容只在桌面设备显示
     </div>
-    
+
     <!-- 取反指令 -->
     <div v-mobile.not class="not-mobile">
       🚫 这个内容在非移动设备显示
     </div>
-    
+
     <!-- 方向指令 -->
     <div v-portrait class="portrait-only">
       📱 竖屏专用内容
     </div>
-    
+
     <div v-landscape class="landscape-only">
       📱 横屏专用内容
     </div>
-    
+
     <!-- 触摸设备指令 -->
     <div v-touch class="touch-only">
       👆 触摸设备专用交互
     </div>
-    
+
     <!-- 组合指令 -->
     <div v-device="'mobile'" class="specific-device">
       指定移动设备显示
     </div>
-    
+
     <div v-device="['tablet', 'desktop']" class="multiple-devices">
       平板或桌面设备显示
     </div>
@@ -305,28 +307,8 @@ const toggleMenu = () => {
 <div class="example-container">
 
 ```vue
-<template>
-  <div class="image-optimization">
-    <h3>响应式图片示例</h3>
-    
-    <!-- 基础响应式图片 -->
-    <ResponsiveImage
-      src="/images/hero"
-      alt="响应式图片示例"
-      class="hero-image"
-    />
-    
-    <!-- 带加载状态的图片 -->
-    <LazyImage
-      src="/images/gallery/photo1"
-      alt="懒加载图片"
-      :loading="true"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useDevice } from '@ldesign/device'
 
 // 响应式图片组件
@@ -337,28 +319,28 @@ const ResponsiveImage = defineComponent({
   },
   setup(props) {
     const { isMobile, isTablet, deviceInfo } = useDevice()
-    
+
     const optimizedSrc = computed(() => {
       const { src } = props
       const isHighDPI = deviceInfo.value.pixelRatio > 1
-      
+
       // 移动设备
       if (isMobile.value) {
         const size = isHighDPI ? '@2x-mobile' : '-mobile'
         return `${src}${size}.jpg`
       }
-      
+
       // 平板设备
       if (isTablet.value) {
         const size = isHighDPI ? '@2x-tablet' : '-tablet'
         return `${src}${size}.jpg`
       }
-      
+
       // 桌面设备
       const size = isHighDPI ? '@2x' : ''
       return `${src}${size}.jpg`
     })
-    
+
     return () => h('img', {
       src: optimizedSrc.value,
       alt: props.alt,
@@ -379,17 +361,19 @@ const LazyImage = defineComponent({
     const imageRef = ref<HTMLImageElement>()
     const isLoaded = ref(false)
     const isInView = ref(false)
-    
+
     const imageSrc = computed(() => {
-      if (!isInView.value) return ''
-      
+      if (!isInView.value)
+return ''
+
       const { src } = props
       return isMobile.value ? `${src}-mobile.jpg` : `${src}.jpg`
     })
-    
+
     onMounted(() => {
-      if (!imageRef.value) return
-      
+      if (!imageRef.value)
+return
+
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
@@ -399,10 +383,10 @@ const LazyImage = defineComponent({
         },
         { threshold: 0.1 }
       )
-      
+
       observer.observe(imageRef.value)
     })
-    
+
     return () => h('div', {
       ref: imageRef,
       class: 'lazy-image-container'
@@ -410,7 +394,7 @@ const LazyImage = defineComponent({
       props.loading && !isLoaded.value && h('div', {
         class: 'loading-placeholder'
       }, '加载中...'),
-      
+
       imageSrc.value && h('img', {
         src: imageSrc.value,
         alt: props.alt,
@@ -420,6 +404,26 @@ const LazyImage = defineComponent({
   }
 })
 </script>
+
+<template>
+  <div class="image-optimization">
+    <h3>响应式图片示例</h3>
+
+    <!-- 基础响应式图片 -->
+    <ResponsiveImage
+      src="/images/hero"
+      alt="响应式图片示例"
+      class="hero-image"
+    />
+
+    <!-- 带加载状态的图片 -->
+    <LazyImage
+      src="/images/gallery/photo1"
+      alt="懒加载图片"
+      :loading="true"
+    />
+  </div>
+</template>
 
 <style scoped>
 .image-optimization {
@@ -459,58 +463,20 @@ const LazyImage = defineComponent({
 <div class="example-container">
 
 ```vue
-<template>
-  <div class="performance-optimization">
-    <h3>性能优化示例</h3>
-    
-    <!-- 根据设备性能调整动画 -->
-    <div 
-      class="animated-element"
-      :class="animationClass"
-      @click="handleClick"
-    >
-      点击我看动画效果
-    </div>
-    
-    <!-- 触摸优化按钮 -->
-    <button 
-      class="interactive-button"
-      :class="buttonClass"
-      @click="handleButtonClick"
-    >
-      {{ buttonText }}
-    </button>
-    
-    <!-- 条件加载复杂组件 -->
-    <Suspense v-if="shouldLoadHeavyComponent">
-      <template #default>
-        <HeavyComponent />
-      </template>
-      <template #fallback>
-        <div class="loading">加载中...</div>
-      </template>
-    </Suspense>
-    
-    <div v-else class="simple-placeholder">
-      简化版内容（移动设备）
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue'
 import { useDevice, useDeviceFeatures } from '@ldesign/device'
 
-const { 
-  isMobile, 
-  isTablet, 
-  isTouchDevice, 
-  deviceInfo 
+const {
+  isMobile,
+  isTablet,
+  isTouchDevice,
+  deviceInfo
 } = useDevice()
 
-const { 
-  hasHighDPI, 
-  isSmallScreen 
+const {
+  hasHighDPI,
+  isSmallScreen
 } = useDeviceFeatures()
 
 // 根据设备性能决定动画复杂度
@@ -537,33 +503,75 @@ const shouldLoadHeavyComponent = computed(() => {
 })
 
 // 懒加载重型组件
-const HeavyComponent = defineAsyncComponent(() => 
+const HeavyComponent = defineAsyncComponent(() =>
   import('./HeavyComponent.vue')
 )
 
-const handleClick = () => {
+function handleClick() {
   if (isMobile.value) {
     // 移动设备使用简单反馈
     console.log('简单点击反馈')
-  } else {
+  }
+ else {
     // 桌面设备可以有更复杂的交互
     console.log('复杂点击反馈')
   }
 }
 
-const handleButtonClick = () => {
+function handleButtonClick() {
   // 根据设备类型提供不同的反馈
   if (isTouchDevice.value) {
     // 触摸设备：触觉反馈
     if ('vibrate' in navigator) {
       navigator.vibrate(50)
     }
-  } else {
+  }
+ else {
     // 非触摸设备：视觉反馈
     console.log('鼠标点击反馈')
   }
 }
 </script>
+
+<template>
+  <div class="performance-optimization">
+    <h3>性能优化示例</h3>
+
+    <!-- 根据设备性能调整动画 -->
+    <div
+      class="animated-element"
+      :class="animationClass"
+      @click="handleClick"
+    >
+      点击我看动画效果
+    </div>
+
+    <!-- 触摸优化按钮 -->
+    <button
+      class="interactive-button"
+      :class="buttonClass"
+      @click="handleButtonClick"
+    >
+      {{ buttonText }}
+    </button>
+
+    <!-- 条件加载复杂组件 -->
+    <Suspense v-if="shouldLoadHeavyComponent">
+      <template #default>
+        <HeavyComponent />
+      </template>
+      <template #fallback>
+        <div class="loading">
+          加载中...
+        </div>
+      </template>
+    </Suspense>
+
+    <div v-else class="simple-placeholder">
+      简化版内容（移动设备）
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .performance-optimization {

@@ -93,20 +93,6 @@ unsubscribe()
 ### Vue 3 集成
 
 ```vue
-<template>
-  <div>
-    <h2>设备信息</h2>
-    <p>设备类型: {{ deviceInfo.type }}</p>
-    <p>屏幕方向: {{ deviceInfo.orientation }}</p>
-    <p>屏幕尺寸: {{ deviceInfo.width }} x {{ deviceInfo.height }}</p>
-
-    <!-- 条件渲染 -->
-    <div v-if="isMobile">移动端专用内容</div>
-    <div v-else-if="isTablet">平板专用内容</div>
-    <div v-else>桌面端专用内容</div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { useDevice } from '@ldesign/device'
 
@@ -119,6 +105,26 @@ const {
   isLandscape
 } = useDevice()
 </script>
+
+<template>
+  <div>
+    <h2>设备信息</h2>
+    <p>设备类型: {{ deviceInfo.type }}</p>
+    <p>屏幕方向: {{ deviceInfo.orientation }}</p>
+    <p>屏幕尺寸: {{ deviceInfo.width }} x {{ deviceInfo.height }}</p>
+
+    <!-- 条件渲染 -->
+    <div v-if="isMobile">
+      移动端专用内容
+    </div>
+    <div v-else-if="isTablet">
+      平板专用内容
+    </div>
+    <div v-else>
+      桌面端专用内容
+    </div>
+  </div>
+</template>
 ```
 
 ### Vue3 插件使用
@@ -126,8 +132,8 @@ const {
 ```typescript
 // main.ts
 import { createApp } from 'vue'
-import { DevicePlugin } from '@ldesign/device'
 import App from './App.vue'
+import { DevicePlugin } from '@ldesign/device'
 
 const app = createApp(App)
 
@@ -146,22 +152,38 @@ app.mount('#app')
 <template>
   <div>
     <!-- 设备类型指令 -->
-    <div v-mobile>📱 仅移动端显示</div>
-    <div v-tablet>📱 仅平板显示</div>
-    <div v-desktop>💻 仅桌面显示</div>
+    <div v-mobile>
+      📱 仅移动端显示
+    </div>
+    <div v-tablet>
+      📱 仅平板显示
+    </div>
+    <div v-desktop>
+      💻 仅桌面显示
+    </div>
 
     <!-- 取反指令 -->
-    <div v-mobile.not>🚫 非移动端显示</div>
+    <div v-mobile.not>
+      🚫 非移动端显示
+    </div>
 
     <!-- 方向指令 -->
-    <div v-portrait>📱 竖屏内容</div>
-    <div v-landscape>📱 横屏内容</div>
+    <div v-portrait>
+      📱 竖屏内容
+    </div>
+    <div v-landscape>
+      📱 横屏内容
+    </div>
 
     <!-- 触摸设备指令 -->
-    <div v-touch>👆 触摸设备专用</div>
+    <div v-touch>
+      👆 触摸设备专用
+    </div>
 
     <!-- 组合指令 -->
-    <div v-device="['tablet', 'desktop']">平板或桌面</div>
+    <div v-device="['tablet', 'desktop']">
+      平板或桌面
+    </div>
   </div>
 </template>
 ```
@@ -249,11 +271,11 @@ detector.destroy()
 import { getExtendedDeviceInfo } from '@ldesign/device'
 
 const extendedInfo = await getExtendedDeviceInfo()
-console.log(extendedInfo.os)       // 操作系统信息
-console.log(extendedInfo.browser)  // 浏览器信息
+console.log(extendedInfo.os) // 操作系统信息
+console.log(extendedInfo.browser) // 浏览器信息
 console.log(extendedInfo.hardware) // 硬件信息
-console.log(extendedInfo.network)  // 网络信息
-console.log(extendedInfo.battery)  // 电池信息
+console.log(extendedInfo.network) // 网络信息
+console.log(extendedInfo.battery) // 电池信息
 ```
 
 ### 框架适配器 API
@@ -291,16 +313,16 @@ if (adapter) {
 import { useDevice } from '@ldesign/device'
 
 const {
-  deviceInfo,      // 设备信息
-  isLoading,       // 加载状态
-  error,           // 错误信息
-  isMobile,        // 是否移动设备
-  isTablet,        // 是否平板设备
-  isDesktop,       // 是否桌面设备
-  isPortrait,      // 是否竖屏
-  isLandscape,     // 是否横屏
-  isTouchDevice,   // 是否触摸设备
-  refresh          // 刷新设备信息
+  deviceInfo, // 设备信息
+  isLoading, // 加载状态
+  error, // 错误信息
+  isMobile, // 是否移动设备
+  isTablet, // 是否平板设备
+  isDesktop, // 是否桌面设备
+  isPortrait, // 是否竖屏
+  isLandscape, // 是否横屏
+  isTouchDevice, // 是否触摸设备
+  refresh // 刷新设备信息
 } = useDevice()
 ```
 
@@ -312,7 +334,7 @@ const {
 import { useDeviceType } from '@ldesign/device'
 
 const {
-  deviceType,  // 'mobile' | 'tablet' | 'desktop'
+  deviceType, // 'mobile' | 'tablet' | 'desktop'
   isMobile,
   isTablet,
   isDesktop
@@ -327,7 +349,7 @@ const {
 import { useOrientation } from '@ldesign/device'
 
 const {
-  orientation,  // 'portrait' | 'landscape'
+  orientation, // 'portrait' | 'landscape'
   isPortrait,
   isLandscape
 } = useOrientation()
@@ -348,7 +370,7 @@ const {
   isLandscape,
   isRetina,
   isDarkMode,
-  activeBreakpoint  // 当前激活的断点
+  activeBreakpoint // 当前激活的断点
 } = useBreakpoints()
 ```
 
@@ -371,6 +393,10 @@ const isRetina = useMediaQuery('(-webkit-min-device-pixel-ratio: 2)')
 设备信息展示组件。
 
 ```vue
+<script setup>
+import { DeviceInfo } from '@ldesign/device'
+</script>
+
 <template>
   <!-- 基础使用 -->
   <DeviceInfo />
@@ -386,10 +412,6 @@ const isRetina = useMediaQuery('(-webkit-min-device-pixel-ratio: 2)')
     class="my-device-info"
   />
 </template>
-
-<script setup>
-import { DeviceInfo } from '@ldesign/device'
-</script>
 ```
 
 ## ⚙️ 配置选项
@@ -397,16 +419,16 @@ import { DeviceInfo } from '@ldesign/device'
 ```typescript
 interface DeviceDetectionConfig {
   /** 平板设备的最小宽度阈值 (px) */
-  tabletMinWidth?: number        // 默认: 768
+  tabletMinWidth?: number // 默认: 768
 
   /** 桌面设备的最小宽度阈值 (px) */
-  desktopMinWidth?: number       // 默认: 1024
+  desktopMinWidth?: number // 默认: 1024
 
   /** 是否启用用户代理检测 */
-  enableUserAgentDetection?: boolean  // 默认: true
+  enableUserAgentDetection?: boolean // 默认: true
 
   /** 是否启用触摸检测 */
-  enableTouchDetection?: boolean      // 默认: true
+  enableTouchDetection?: boolean // 默认: true
 }
 ```
 
@@ -421,8 +443,10 @@ const { isMobile, isTablet, isDesktop } = useDevice()
 
 // 根据设备类型调整布局
 const columns = computed(() => {
-  if (isMobile.value) return 1
-  if (isTablet.value) return 2
+  if (isMobile.value)
+return 1
+  if (isTablet.value)
+return 2
   return 3
 })
 ```
@@ -437,8 +461,10 @@ const { isMobile, deviceInfo } = useDevice()
 // 根据设备类型加载不同尺寸的图片
 const imageUrl = computed(() => {
   const baseUrl = '/images/hero'
-  if (isMobile.value) return `${baseUrl}-mobile.jpg`
-  if (deviceInfo.value.pixelRatio > 1) return `${baseUrl}-2x.jpg`
+  if (isMobile.value)
+return `${baseUrl}-mobile.jpg`
+  if (deviceInfo.value.pixelRatio > 1)
+return `${baseUrl}-2x.jpg`
   return `${baseUrl}.jpg`
 })
 ```
@@ -460,17 +486,11 @@ const touchOptimized = computed(() => isTouchDevice.value)
 ### 自适应组件
 
 ```vue
-<template>
-  <div :class="containerClass">
-    <component :is="currentComponent" />
-  </div>
-</template>
-
 <script setup>
 import { computed } from 'vue'
-import { useDevice } from '@ldesign/device'
 import MobileNav from './MobileNav.vue'
 import DesktopNav from './DesktopNav.vue'
+import { useDevice } from '@ldesign/device'
 
 const { isMobile, isTablet } = useDevice()
 
@@ -484,6 +504,12 @@ const containerClass = computed(() => ({
   'container-desktop': !isMobile.value && !isTablet.value
 }))
 </script>
+
+<template>
+  <div :class="containerClass">
+    <component :is="currentComponent" />
+  </div>
+</template>
 ```
 
 ## 🔧 高级用法
@@ -530,7 +556,7 @@ class CustomDeviceDetector {
 ### 媒体查询管理器
 
 ```typescript
-import { createMediaQueryListener, MEDIA_QUERIES } from '@ldesign/device'
+import { MEDIA_QUERIES, createMediaQueryListener } from '@ldesign/device'
 
 class MediaQueryManager {
   private listeners = new Map()
@@ -602,21 +628,15 @@ class MediaQueryManager {
 module.exports = {
   theme: {
     screens: {
-      'mobile': {'max': '767px'},
-      'tablet': {'min': '768px', 'max': '1023px'},
-      'desktop': {'min': '1024px'},
+      mobile: { max: '767px' },
+      tablet: { min: '768px', max: '1023px' },
+      desktop: { min: '1024px' },
     }
   }
 }
 ```
 
 ```vue
-<template>
-  <div :class="responsiveClasses">
-    响应式内容
-  </div>
-</template>
-
 <script setup>
 import { computed } from 'vue'
 import { useDevice } from '@ldesign/device'
@@ -632,6 +652,12 @@ const responsiveClasses = computed(() => [
   }
 ])
 </script>
+
+<template>
+  <div :class="responsiveClasses">
+    响应式内容
+  </div>
+</template>
 ```
 
 ## 🧪 测试
@@ -650,7 +676,7 @@ pnpm test:ui
 ### 测试示例
 
 ```typescript
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { useDevice } from '@ldesign/device'
 

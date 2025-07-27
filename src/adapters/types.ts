@@ -9,9 +9,9 @@ export interface FrameworkAdapter {
   /** 适配器版本 */
   version: string
   /** 初始化适配器 */
-  init(config?: DeviceDetectionConfig): void
+  init: (config?: DeviceDetectionConfig) => void
   /** 销毁适配器 */
-  destroy(): void
+  destroy: () => void
 }
 
 /**
@@ -19,11 +19,11 @@ export interface FrameworkAdapter {
  */
 export interface ReactiveAdapter extends FrameworkAdapter {
   /** 创建响应式设备信息 */
-  createReactiveDeviceInfo(config?: DeviceDetectionConfig): any
+  createReactiveDeviceInfo: (config?: DeviceDetectionConfig) => any
   /** 创建响应式设备类型 */
-  createReactiveDeviceType(config?: DeviceDetectionConfig): any
+  createReactiveDeviceType: (config?: DeviceDetectionConfig) => any
   /** 创建响应式屏幕方向 */
-  createReactiveOrientation(config?: DeviceDetectionConfig): any
+  createReactiveOrientation: (config?: DeviceDetectionConfig) => any
 }
 
 /**
@@ -31,9 +31,9 @@ export interface ReactiveAdapter extends FrameworkAdapter {
  */
 export interface ComponentAdapter extends FrameworkAdapter {
   /** 创建设备信息组件 */
-  createDeviceInfoComponent(props?: any): any
+  createDeviceInfoComponent: (props?: any) => any
   /** 创建设备提供者组件 */
-  createDeviceProviderComponent(props?: any): any
+  createDeviceProviderComponent: (props?: any) => any
 }
 
 /**
@@ -41,9 +41,9 @@ export interface ComponentAdapter extends FrameworkAdapter {
  */
 export interface DirectiveAdapter extends FrameworkAdapter {
   /** 注册设备相关指令 */
-  registerDirectives(): void
+  registerDirectives: () => void
   /** 创建条件渲染指令 */
-  createConditionalDirective(condition: string): any
+  createConditionalDirective: (condition: string) => any
 }
 
 /**
@@ -51,7 +51,7 @@ export interface DirectiveAdapter extends FrameworkAdapter {
  */
 export interface FullFrameworkAdapter extends ReactiveAdapter, ComponentAdapter, DirectiveAdapter {
   /** 安装适配器到框架实例 */
-  install(app: any, options?: DeviceDetectionConfig): void
+  install: (app: any, options?: DeviceDetectionConfig) => void
 }
 
 /**
@@ -59,11 +59,11 @@ export interface FullFrameworkAdapter extends ReactiveAdapter, ComponentAdapter,
  */
 export interface AdapterFactory {
   /** 创建适配器实例 */
-  create(config?: DeviceDetectionConfig): FullFrameworkAdapter
+  create: (config?: DeviceDetectionConfig) => FullFrameworkAdapter
   /** 检查框架兼容性 */
-  isCompatible(): boolean
+  isCompatible: () => boolean
   /** 获取支持的框架版本 */
-  getSupportedVersions(): string[]
+  getSupportedVersions: () => string[]
 }
 
 /**
@@ -71,13 +71,13 @@ export interface AdapterFactory {
  */
 export interface AdapterRegistry {
   /** 注册适配器 */
-  register(name: string, factory: AdapterFactory): void
+  register: (name: string, factory: AdapterFactory) => void
   /** 获取适配器 */
-  get(name: string): AdapterFactory | undefined
+  get: (name: string) => AdapterFactory | undefined
   /** 获取所有适配器 */
-  getAll(): Map<string, AdapterFactory>
+  getAll: () => Map<string, AdapterFactory>
   /** 自动检测并获取适配器 */
-  detect(): AdapterFactory | undefined
+  detect: () => AdapterFactory | undefined
 }
 
 /**
@@ -158,14 +158,15 @@ export class FrameworkDetector {
             name: 'vue3',
             version: vue.version,
             supported: true,
-            confidence: 0.9
+            confidence: 0.9,
           })
-        } else if (vue.version.startsWith('2.')) {
+        }
+ else if (vue.version.startsWith('2.')) {
           results.push({
             name: 'vue2',
             version: vue.version,
             supported: false, // 暂未实现
-            confidence: 0.9
+            confidence: 0.9,
           })
         }
       }
@@ -178,7 +179,7 @@ export class FrameworkDetector {
         name: 'react',
         version: react.version || 'unknown',
         supported: false, // 暂未实现
-        confidence: 0.8
+        confidence: 0.8,
       })
     }
 

@@ -34,16 +34,16 @@ const isLandscape = computed(() => deviceInfo.value.orientation === 'landscape')
 const detectDevice = () => {
   const width = window.innerWidth
   const height = window.innerHeight
-  
+
   let type = 'desktop'
   if (width < config.value.tabletMinWidth) {
     type = 'mobile'
   } else if (width < config.value.desktopMinWidth) {
     type = 'tablet'
   }
-  
+
   const orientation = width > height ? 'landscape' : 'portrait'
-  
+
   deviceInfo.value = {
     type,
     orientation,
@@ -130,19 +130,19 @@ const simulateChange = (type) => {
     <div class="control-group">
       <label>设备类型:</label>
       <div class="button-group">
-        <button 
+        <button
           @click="simulateChange('mobile')"
           :class="{ active: isMobile }"
         >
           📱 Mobile
         </button>
-        <button 
+        <button
           @click="simulateChange('tablet')"
           :class="{ active: isTablet }"
         >
           📱 Tablet
         </button>
-        <button 
+        <button
           @click="simulateChange('desktop')"
           :class="{ active: isDesktop }"
         >
@@ -150,17 +150,17 @@ const simulateChange = (type) => {
         </button>
       </div>
     </div>
-    
+
     <div class="control-group">
       <label>屏幕方向:</label>
       <div class="button-group">
-        <button 
+        <button
           @click="setOrientation('portrait')"
           :class="{ active: isPortrait }"
         >
           📱 Portrait
         </button>
-        <button 
+        <button
           @click="setOrientation('landscape')"
           :class="{ active: isLandscape }"
         >
@@ -214,10 +214,10 @@ const simulateChange = (type) => {
   <div class="config-grid">
     <div class="config-item">
       <label>平板最小宽度:</label>
-      <input 
-        v-model.number="config.tabletMinWidth" 
-        type="number" 
-        min="300" 
+      <input
+        v-model.number="config.tabletMinWidth"
+        type="number"
+        min="300"
         max="1200"
         @input="detectDevice"
       />
@@ -225,10 +225,10 @@ const simulateChange = (type) => {
     </div>
     <div class="config-item">
       <label>桌面最小宽度:</label>
-      <input 
-        v-model.number="config.desktopMinWidth" 
-        type="number" 
-        min="600" 
+      <input
+        v-model.number="config.desktopMinWidth"
+        type="number"
+        min="600"
         max="1920"
         @input="detectDevice"
       />
@@ -236,8 +236,8 @@ const simulateChange = (type) => {
     </div>
     <div class="config-item">
       <label>
-        <input 
-          v-model="config.enableUserAgentDetection" 
+        <input
+          v-model="config.enableUserAgentDetection"
           type="checkbox"
         />
         启用用户代理检测
@@ -245,8 +245,8 @@ const simulateChange = (type) => {
     </div>
     <div class="config-item">
       <label>
-        <input 
-          v-model="config.enableTouchDetection" 
+        <input
+          v-model="config.enableTouchDetection"
           type="checkbox"
         />
         启用触摸检测
@@ -260,9 +260,9 @@ const simulateChange = (type) => {
 <div class="logs-panel">
   <h3>📋 变化日志</h3>
   <div class="logs-container">
-    <div 
-      v-for="log in logs" 
-      :key="log.time" 
+    <div
+      v-for="log in logs"
+      :key="log.time"
       class="log-item"
     >
       <span class="log-time">{{ log.time }}</span>
@@ -291,11 +291,11 @@ const deviceInfo = {
 }
 
 // Vue 组合式 API 使用
-const { 
-  deviceInfo, 
-  isMobile, 
-  isTablet, 
-  isDesktop 
+const {
+  deviceInfo,
+  isMobile,
+  isTablet,
+  isDesktop
 } = useDevice({
   tabletMinWidth: {{ config.tabletMinWidth }},
   desktopMinWidth: {{ config.desktopMinWidth }}
@@ -305,7 +305,7 @@ const {
 if (isMobile.value) {
   // 移动端逻辑
 } else if (isTablet.value) {
-  // 平板端逻辑  
+  // 平板端逻辑
 } else {
   // 桌面端逻辑
 }

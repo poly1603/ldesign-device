@@ -5,14 +5,14 @@ export * from './DeviceDetector'
 export * from './FeatureDetector'
 
 // 重新导出主要API
-export { 
-  createDeviceDetector, 
-  getGlobalDeviceDetector, 
-  getDeviceInfo, 
-  onDeviceChange 
+export {
+  createDeviceDetector,
+  getGlobalDeviceDetector,
+  getDeviceInfo,
+  onDeviceChange,
 } from './DeviceDetector'
 
-export { 
-  getGlobalFeatureDetector, 
-  getExtendedDeviceInfo 
+export {
+  getGlobalFeatureDetector,
+  getExtendedDeviceInfo,
 } from './FeatureDetector'

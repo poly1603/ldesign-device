@@ -1,10 +1,95 @@
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onDeviceChange, useDevice, useDeviceFeatures } from '@ldesign/device'
+
+const {
+  deviceInfo,
+  isMobile,
+  isTablet,
+  isDesktop,
+  isPortrait,
+  isLandscape,
+  isTouchDevice,
+  refresh,
+} = useDevice()
+
+const { hasHighDPI, isSmallScreen } = useDeviceFeatures()
+
+const changeLogs = ref<Array<{ id: number, time: string, message: string }>>([])
+let logId = 0
+
+const gridClass = computed(() => ({
+  'grid': true,
+  'grid-mobile': isMobile.value,
+  'grid-tablet': isTablet.value,
+  'grid-desktop': isDesktop.value,
+}))
+
+function getDeviceTypeLabel(type: string) {
+  const labels = {
+    mobile: '📱 移动设备',
+    tablet: '📱 平板设备',
+    desktop: '💻 桌面设备',
+  }
+  return labels[type as keyof typeof labels] || '❓ 未知设备'
+}
+
+function getOrientationLabel(orientation: string) {
+  const labels = {
+    portrait: '📱 竖屏',
+    landscape: '📱 横屏',
+  }
+  return labels[orientation as keyof typeof labels] || '❓ 未知方向'
+}
+
+function addLog(message: string) {
+  changeLogs.value.unshift({
+    id: ++logId,
+    time: new Date().toLocaleTimeString(),
+    message,
+  })
+
+  // 保持最多10条记录
+  if (changeLogs.value.length > 10) {
+    changeLogs.value.pop()
+  }
+}
+
+function refreshDeviceInfo() {
+  refresh()
+  addLog('手动刷新设备信息')
+}
+
+function clearLogs() {
+  changeLogs.value = []
+}
+
+// 监听设备变化
+let unsubscribe: (() => void) | null = null
+
+onMounted(() => {
+  unsubscribe = onDeviceChange((event) => {
+    const changes = event.changes.join(', ')
+    addLog(`设备信息变化: ${changes}`)
+  })
+
+  addLog('设备检测器初始化完成')
+})
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe()
+  }
+})
+</script>
+
 <template>
   <section id="device-info" class="device-info-section">
     <div class="section-header">
       <h2>📱 设备信息检测</h2>
       <p>实时显示当前设备的详细信息</p>
     </div>
-    
+
     <div :class="gridClass">
       <!-- 基础设备信息 -->
       <div class="info-card">
@@ -38,7 +123,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 设备特性 -->
       <div class="info-card">
         <h3>✨ 设备特性</h3>
@@ -77,20 +162,20 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 实时监听 -->
       <div class="info-card">
         <h3>🔄 实时监听</h3>
         <div class="monitoring">
           <p class="monitoring-status">
-            <span class="status-indicator active"></span>
+            <span class="status-indicator active" />
             监听器状态: 活跃
           </p>
           <div class="change-log">
             <h4>变化日志:</h4>
             <div class="log-container">
-              <div 
-                v-for="log in changeLogs" 
+              <div
+                v-for="log in changeLogs"
                 :key="log.id"
                 class="log-item"
               >
@@ -105,7 +190,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 操作按钮 -->
     <div class="actions">
       <button class="btn" @click="refreshDeviceInfo">
@@ -117,91 +202,6 @@
     </div>
   </section>
 </template>
-
-<script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useDevice, useDeviceFeatures, onDeviceChange } from '@ldesign/device'
-
-const { 
-  deviceInfo, 
-  isMobile, 
-  isTablet, 
-  isDesktop, 
-  isPortrait, 
-  isLandscape, 
-  isTouchDevice,
-  refresh 
-} = useDevice()
-
-const { hasHighDPI, isSmallScreen } = useDeviceFeatures()
-
-const changeLogs = ref<Array<{ id: number; time: string; message: string }>>([])
-let logId = 0
-
-const gridClass = computed(() => ({
-  'grid': true,
-  'grid-mobile': isMobile.value,
-  'grid-tablet': isTablet.value,
-  'grid-desktop': isDesktop.value
-}))
-
-const getDeviceTypeLabel = (type: string) => {
-  const labels = {
-    mobile: '📱 移动设备',
-    tablet: '📱 平板设备',
-    desktop: '💻 桌面设备'
-  }
-  return labels[type as keyof typeof labels] || '❓ 未知设备'
-}
-
-const getOrientationLabel = (orientation: string) => {
-  const labels = {
-    portrait: '📱 竖屏',
-    landscape: '📱 横屏'
-  }
-  return labels[orientation as keyof typeof labels] || '❓ 未知方向'
-}
-
-const addLog = (message: string) => {
-  changeLogs.value.unshift({
-    id: ++logId,
-    time: new Date().toLocaleTimeString(),
-    message
-  })
-  
-  // 保持最多10条记录
-  if (changeLogs.value.length > 10) {
-    changeLogs.value.pop()
-  }
-}
-
-const refreshDeviceInfo = () => {
-  refresh()
-  addLog('手动刷新设备信息')
-}
-
-const clearLogs = () => {
-  changeLogs.value = []
-}
-
-// 监听设备变化
-let unsubscribe: (() => void) | null = null
-
-onMounted(() => {
-  unsubscribe = onDeviceChange((event) => {
-    const changes = event.changes.join(', ')
-    addLog(`设备信息变化: ${changes}`)
-  })
-  
-  addLog('设备检测器初始化完成')
-})
-
-onUnmounted(() => {
-  if (unsubscribe) {
-    unsubscribe()
-  }
-})
-</script>
 
 <style scoped>
 .device-info-section {
@@ -368,15 +368,15 @@ onUnmounted(() => {
   .section-header h2 {
     font-size: 1.5rem;
   }
-  
+
   .info-card {
     padding: 1rem;
   }
-  
+
   .features-list {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .actions {
     flex-direction: column;
     align-items: center;

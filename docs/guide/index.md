@@ -45,9 +45,15 @@ const { deviceInfo, isMobile, isTablet, isDesktop } = useDevice()
 ### 指令系统
 ```vue
 <template>
-  <div v-mobile>移动端内容</div>
-  <div v-desktop>桌面端内容</div>
-  <div v-portrait>竖屏内容</div>
+  <div v-mobile>
+    移动端内容
+  </div>
+  <div v-desktop>
+    桌面端内容
+  </div>
+  <div v-portrait>
+    竖屏内容
+  </div>
 </template>
 ```
 
@@ -75,8 +81,10 @@ app.use(DevicePlugin)
 
 ```typescript
 const columns = computed(() => {
-  if (isMobile.value) return 1
-  if (isTablet.value) return 2
+  if (isMobile.value)
+return 1
+  if (isTablet.value)
+return 2
   return 3
 })
 ```
@@ -87,8 +95,10 @@ const columns = computed(() => {
 ```typescript
 const imageUrl = computed(() => {
   const baseUrl = '/images/hero'
-  if (isMobile.value) return `${baseUrl}-mobile.jpg`
-  if (deviceInfo.value.pixelRatio > 1) return `${baseUrl}-2x.jpg`
+  if (isMobile.value)
+return `${baseUrl}-mobile.jpg`
+  if (deviceInfo.value.pixelRatio > 1)
+return `${baseUrl}-2x.jpg`
   return `${baseUrl}.jpg`
 })
 ```
@@ -106,7 +116,7 @@ const touchOptimized = computed(() => isTouchDevice.value)
 
 ```vue
 <template>
-  <button 
+  <button
     :class="{ 'touch-optimized': isTouchDevice }"
     @click="handleClick"
   >
@@ -132,7 +142,7 @@ const touchOptimized = computed(() => isTouchDevice.value)
 ## 🔮 未来规划
 
 - [ ] Vue2 适配器
-- [ ] React 适配器  
+- [ ] React 适配器
 - [ ] 更多设备特性检测
 - [ ] 离线状态检测
 - [ ] 设备性能评估

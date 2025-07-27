@@ -21,9 +21,9 @@ export default defineConfig({
         items: [
           { text: 'GitHub', link: 'https://github.com/poly1603/ldesign-device' },
           { text: 'NPM', link: 'https://www.npmjs.com/package/@ldesign/device' },
-          { text: 'LDesign', link: 'https://ldesign.dev' }
-        ]
-      }
+          { text: 'LDesign', link: 'https://ldesign.dev' },
+        ],
+      },
     ],
 
     // 侧边栏
@@ -34,16 +34,16 @@ export default defineConfig({
           items: [
             { text: '介绍', link: '/guide/' },
             { text: '快速开始', link: '/guide/getting-started' },
-            { text: '安装', link: '/guide/installation' }
-          ]
+            { text: '安装', link: '/guide/installation' },
+          ],
         },
         {
           text: '核心概念',
           items: [
             { text: '设备类型检测', link: '/guide/device-detection' },
             { text: '屏幕方向检测', link: '/guide/orientation-detection' },
-            { text: '响应式监听', link: '/guide/reactive-listening' }
-          ]
+            { text: '响应式监听', link: '/guide/reactive-listening' },
+          ],
         },
         {
           text: 'Vue 集成',
@@ -51,9 +51,9 @@ export default defineConfig({
             { text: 'Composition API', link: '/guide/vue-composition' },
             { text: '组件', link: '/guide/vue-components' },
             { text: '指令', link: '/guide/vue-directives' },
-            { text: '插件', link: '/guide/vue-plugin' }
-          ]
-        }
+            { text: '插件', link: '/guide/vue-plugin' },
+          ],
+        },
       ],
       '/api/': [
         {
@@ -62,17 +62,17 @@ export default defineConfig({
             { text: '概览', link: '/api/' },
             { text: '设备检测器', link: '/api/device-detector' },
             { text: '特性检测器', link: '/api/feature-detector' },
-            { text: '工具函数', link: '/api/utils' }
-          ]
+            { text: '工具函数', link: '/api/utils' },
+          ],
         },
         {
           text: 'Vue API',
           items: [
             { text: 'Composition API', link: '/api/vue-composition' },
             { text: '组件', link: '/api/vue-components' },
-            { text: '指令', link: '/api/vue-directives' }
-          ]
-        }
+            { text: '指令', link: '/api/vue-directives' },
+          ],
+        },
       ],
       '/examples/': [
         {
@@ -80,44 +80,44 @@ export default defineConfig({
           items: [
             { text: '概览', link: '/examples/' },
             { text: '设备检测', link: '/examples/device-detection' },
-            { text: '响应式布局', link: '/examples/responsive-layout' }
-          ]
-        }
-      ]
+            { text: '响应式布局', link: '/examples/responsive-layout' },
+          ],
+        },
+      ],
     },
 
     // 社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/poly1603/ldesign-device' }
+      { icon: 'github', link: 'https://github.com/poly1603/ldesign-device' },
     ],
 
     // 页脚
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024 LDesign Team'
+      copyright: 'Copyright © 2024 LDesign Team',
     },
 
     // 搜索
     search: {
-      provider: 'local'
-    }
+      provider: 'local',
+    },
   },
 
   // Markdown 配置
   markdown: {
     theme: {
       light: 'github-light',
-      dark: 'github-dark'
+      dark: 'github-dark',
     },
-    lineNumbers: true
+    lineNumbers: true,
   },
 
   // Vite 配置
   vite: {
     resolve: {
       alias: {
-        '@ldesign/device': '../src'
-      }
-    }
-  }
+        '@ldesign/device': '../src',
+      },
+    },
+  },
 })

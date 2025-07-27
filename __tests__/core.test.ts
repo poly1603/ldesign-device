@@ -9,32 +9,32 @@ const mockWindow = {
   devicePixelRatio: 2,
   // 移除 orientation 属性，让其回退到屏幕尺寸判断
   addEventListener: vi.fn(),
-  removeEventListener: vi.fn()
+  removeEventListener: vi.fn(),
 }
 
 const mockDocument = {
   documentElement: {
     clientWidth: 1920,
-    clientHeight: 1080
+    clientHeight: 1080,
   },
   body: {
     clientWidth: 1920,
-    clientHeight: 1080
-  }
+    clientHeight: 1080,
+  },
 }
 
 const mockNavigator = {
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  maxTouchPoints: 0
+  maxTouchPoints: 0,
 }
 
 const mockScreen = {
   // 不提供 orientation API，让其回退到屏幕尺寸判断
   addEventListener: vi.fn(),
-  removeEventListener: vi.fn()
+  removeEventListener: vi.fn(),
 }
 
-describe('DeviceDetector', () => {
+describe('deviceDetector', () => {
   beforeEach(() => {
     // @ts-ignore
     global.window = mockWindow
@@ -52,7 +52,7 @@ describe('DeviceDetector', () => {
     vi.restoreAllMocks()
   })
 
-  describe('DeviceDetectorImpl', () => {
+  describe('deviceDetectorImpl', () => {
     it('should create detector with default config', () => {
       const detector = new DeviceDetectorImpl()
       expect(detector).toBeInstanceOf(DeviceDetectorImpl)
@@ -68,7 +68,7 @@ describe('DeviceDetector', () => {
         height: 1080,
         pixelRatio: 2,
         isTouchDevice: false,
-        userAgent: expect.any(String)
+        userAgent: expect.any(String),
       })
 
       // 方向应该是横屏（宽度 > 高度）
@@ -94,7 +94,7 @@ describe('DeviceDetector', () => {
       unsubscribe()
 
       // Callback should be removed from listeners
-      expect(detector['listeners']).toHaveLength(0)
+      expect(detector.listeners).toHaveLength(0)
     })
 
     it('should setup event listeners', () => {
@@ -111,7 +111,7 @@ describe('DeviceDetector', () => {
 
       expect(mockWindow.removeEventListener).toHaveBeenCalledWith('resize', expect.any(Function))
       expect(mockWindow.removeEventListener).toHaveBeenCalledWith('orientationchange', expect.any(Function))
-      expect(detector['isDestroyed']).toBe(true)
+      expect(detector.isDestroyed).toBe(true)
     })
 
     it('should handle custom config', () => {
@@ -119,7 +119,7 @@ describe('DeviceDetector', () => {
         tabletMinWidth: 600,
         desktopMinWidth: 1200,
         enableUserAgentDetection: false,
-        enableTouchDetection: false
+        enableTouchDetection: false,
       }
 
       const detector = new DeviceDetectorImpl(config)
@@ -167,10 +167,10 @@ describe('DeviceDetector', () => {
       const event = {
         current: detector.getDeviceInfo(),
         previous: null,
-        changes: ['width' as const]
+        changes: ['width' as const],
       }
 
-      detector['notifyListeners'](event)
+      detector.notifyListeners(event)
 
       expect(errorCallback).toHaveBeenCalled()
       expect(normalCallback).toHaveBeenCalled()
@@ -200,7 +200,7 @@ describe('DeviceDetector', () => {
         height: expect.any(Number),
         pixelRatio: expect.any(Number),
         isTouchDevice: expect.any(Boolean),
-        userAgent: expect.any(String)
+        userAgent: expect.any(String),
       })
     })
   })

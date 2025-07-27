@@ -38,7 +38,7 @@
         tabletMinWidth: 768,
         desktopMinWidth: 1024,
         enableUserAgentDetection: true,
-        enableTouchDetection: true
+        enableTouchDetection: true,
     };
 
     /**
@@ -50,7 +50,7 @@
         }
         return {
             width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-            height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+            height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
         };
     }
     /**
@@ -69,10 +69,10 @@
         if (typeof window === 'undefined') {
             return false;
         }
-        return ('ontouchstart' in window ||
-            navigator.maxTouchPoints > 0 ||
+        return ('ontouchstart' in window
+            || navigator.maxTouchPoints > 0
             // @ts-ignore - 兼容旧版本
-            navigator.msMaxTouchPoints > 0);
+            || navigator.msMaxTouchPoints > 0);
     }
     /**
      * 获取用户代理字符串
@@ -268,7 +268,7 @@
                 height,
                 pixelRatio,
                 isTouchDevice: isTouchDev,
-                userAgent
+                userAgent,
             };
         }
         /**
@@ -313,7 +313,7 @@
                 const event = {
                     current: newInfo,
                     previous: previousInfo,
-                    changes
+                    changes,
                 };
                 this.notifyListeners(event);
             }
@@ -338,7 +338,7 @@
          * 通知所有监听器
          */
         notifyListeners(event) {
-            this.listeners.forEach(listener => {
+            this.listeners.forEach((listener) => {
                 try {
                     listener(event);
                 }
@@ -464,7 +464,7 @@
             this.state = {
                 deviceInfo: {},
                 isLoading: true,
-                error: null
+                error: null,
             };
             if (this.options.immediate) {
                 this.init();
@@ -480,14 +480,14 @@
                 this.updateState({
                     deviceInfo: detector.getDeviceInfo(),
                     isLoading: false,
-                    error: null
+                    error: null,
                 });
                 // 监听设备变化
                 this.unsubscribe = detector.onDeviceChange((event) => {
                     this.updateState({
                         deviceInfo: event.current,
                         isLoading: false,
-                        error: null
+                        error: null,
                     });
                 });
             }
@@ -496,7 +496,7 @@
                 this.updateState({
                     deviceInfo: {},
                     isLoading: false,
-                    error: err
+                    error: err,
                 });
                 if (this.options.onError) {
                     this.options.onError(err);
@@ -514,7 +514,7 @@
          * 通知所有监听器
          */
         notifyListeners() {
-            this.listeners.forEach(listener => {
+            this.listeners.forEach((listener) => {
                 try {
                     listener(this.state);
                 }
@@ -554,14 +554,14 @@
                     this.updateState({
                         deviceInfo: detector.getDeviceInfo(),
                         isLoading: false,
-                        error: null
+                        error: null,
                     });
                 }
                 catch (error) {
                     const err = error instanceof Error ? error : new Error(String(error));
                     this.updateState({
                         error: err,
-                        isLoading: false
+                        isLoading: false,
                     });
                     if (this.options.onError) {
                         this.options.onError(err);
@@ -599,7 +599,7 @@
             /** 刷新设备信息 */
             refresh: () => listener.refresh(),
             /** 销毁监听器 */
-            destroy: () => listener.destroy()
+            destroy: () => listener.destroy(),
         };
     }
     /**
@@ -659,7 +659,7 @@
          * 通知所有监听器
          */
         notifyListeners() {
-            this.listeners.forEach(listener => {
+            this.listeners.forEach((listener) => {
                 try {
                     listener(this.currentMatches);
                 }
@@ -721,8 +721,194 @@
         /** 浅色模式 */
         lightMode: '(prefers-color-scheme: light)',
         /** 减少动画 */
-        reducedMotion: '(prefers-reduced-motion: reduce)'
+        reducedMotion: '(prefers-reduced-motion: reduce)',
     };
+
+    /**
+     * 抽象适配器基类
+     */
+    class BaseAdapter {
+        constructor() {
+            Object.defineProperty(this, "config", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: {}
+            });
+            Object.defineProperty(this, "isInitialized", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: false
+            });
+        }
+        init(config) {
+            this.config = { ...this.config, ...config };
+            this.isInitialized = true;
+        }
+        destroy() {
+            this.isInitialized = false;
+            this.config = {};
+        }
+        checkInitialized() {
+            if (!this.isInitialized) {
+                throw new Error(`${this.name} adapter is not initialized`);
+            }
+        }
+    }
+    /**
+     * 框架检测工具
+     */
+    class FrameworkDetector {
+        /**
+         * 检测当前运行的框架
+         */
+        static detect() {
+            const results = [];
+            if (typeof window === 'undefined') {
+                return results;
+            }
+            const win = window;
+            // 检测 Vue
+            if (win.Vue) {
+                const vue = win.Vue;
+                if (vue.version) {
+                    if (vue.version.startsWith('3.')) {
+                        results.push({
+                            name: 'vue3',
+                            version: vue.version,
+                            supported: true,
+                            confidence: 0.9,
+                        });
+                    }
+                    else if (vue.version.startsWith('2.')) {
+                        results.push({
+                            name: 'vue2',
+                            version: vue.version,
+                            supported: false, // 暂未实现
+                            confidence: 0.9,
+                        });
+                    }
+                }
+            }
+            // 检测 React
+            if (win.React) {
+                const react = win.React;
+                results.push({
+                    name: 'react',
+                    version: react.version || 'unknown',
+                    supported: false, // 暂未实现
+                    confidence: 0.8,
+                });
+            }
+            return results.sort((a, b) => b.confidence - a.confidence);
+        }
+        /**
+         * 获取最佳匹配的框架
+         */
+        static getBestMatch() {
+            const results = this.detect();
+            return results.find(r => r.supported) || results[0] || null;
+        }
+    }
+
+    /**
+     * 适配器注册表实现
+     */
+    class AdapterRegistryImpl {
+        constructor() {
+            Object.defineProperty(this, "adapters", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: new Map()
+            });
+        }
+        /**
+         * 注册适配器
+         */
+        register(name, factory) {
+            this.adapters.set(name, factory);
+        }
+        /**
+         * 获取适配器
+         */
+        get(name) {
+            return this.adapters.get(name);
+        }
+        /**
+         * 获取所有适配器
+         */
+        getAll() {
+            return new Map(this.adapters);
+        }
+        /**
+         * 自动检测并获取适配器
+         */
+        detect() {
+            const frameworks = FrameworkDetector.detect();
+            for (const framework of frameworks) {
+                const adapter = this.adapters.get(framework.name);
+                if (adapter && adapter.isCompatible()) {
+                    return adapter;
+                }
+            }
+            return undefined;
+        }
+        /**
+         * 清空注册表
+         */
+        clear() {
+            this.adapters.clear();
+        }
+        /**
+         * 获取支持的框架列表
+         */
+        getSupportedFrameworks() {
+            return Array.from(this.adapters.keys());
+        }
+        /**
+         * 检查框架是否支持
+         */
+        isSupported(framework) {
+            const adapter = this.adapters.get(framework);
+            return adapter ? adapter.isCompatible() : false;
+        }
+    }
+    /**
+     * 全局适配器注册表实例
+     */
+    const globalAdapterRegistry = new AdapterRegistryImpl();
+    /**
+     * 注册适配器的便捷函数
+     */
+    function registerAdapter(name, factory) {
+        globalAdapterRegistry.register(name, factory);
+    }
+    /**
+     * 获取适配器的便捷函数
+     */
+    function getAdapter(name) {
+        return globalAdapterRegistry.get(name);
+    }
+    /**
+     * 自动检测适配器的便捷函数
+     */
+    function detectAdapter() {
+        return globalAdapterRegistry.detect();
+    }
+    /**
+     * 获取所有支持的框架
+     */
+    function getSupportedFrameworks() {
+        return globalAdapterRegistry.getSupportedFrameworks();
+    }
+    /**
+     * 检查框架支持情况
+     */
+    function checkFrameworkSupport() {
+        return FrameworkDetector.detect();
+    }
 
     /**
      * Vue3 设备信息组合式API
@@ -742,7 +928,7 @@
                 onError: (err) => {
                     error.value = err;
                     options.onError?.(err);
-                }
+                },
             });
             unsubscribe = listener.subscribe((state) => {
                 deviceInfo.value = state.deviceInfo;
@@ -782,7 +968,7 @@
             isLandscape,
             isTouchDevice,
             // 方法
-            refresh
+            refresh,
         };
     }
     /**
@@ -798,7 +984,7 @@
             deviceType,
             isMobile,
             isTablet,
-            isDesktop
+            isDesktop,
         };
     }
     /**
@@ -812,7 +998,7 @@
         return {
             orientation,
             isPortrait,
-            isLandscape
+            isLandscape,
         };
     }
     /**
@@ -826,7 +1012,7 @@
         return {
             width,
             height,
-            pixelRatio
+            pixelRatio,
         };
     }
     /**
@@ -888,7 +1074,7 @@
             isLightMode,
             prefersReducedMotion,
             // 当前断点
-            activeBreakpoint
+            activeBreakpoint,
         };
     }
     /**
@@ -912,7 +1098,7 @@
         });
         return {
             startListening,
-            stopListening
+            stopListening,
         };
     }
     /**
@@ -958,31 +1144,350 @@
             isTouchDevice,
             hasHighDPI,
             isSmallScreen,
-            isLargeScreen
+            isLargeScreen,
+        };
+    }
+    /**
+     * 设备上下文 Key
+     */
+    const DEVICE_CONTEXT_KEY$1 = Symbol('device-context');
+    /**
+     * DeviceProvider 组件
+     */
+    const DeviceProvider = vue.defineComponent({
+        name: 'DeviceProvider',
+        props: {
+            config: {
+                type: Object,
+                default: () => ({}),
+            },
+        },
+        setup(props, { slots }) {
+            const deviceContext = useDevice(props.config);
+            // 提供设备上下文
+            vue.provide(DEVICE_CONTEXT_KEY$1, deviceContext);
+            return () => slots.default?.();
+        },
+    });
+
+    /**
+     * Vue3 设备检测上下文 Key
+     */
+    const DEVICE_CONTEXT_KEY = Symbol('device-context');
+    /**
+     * Vue3 适配器实现
+     */
+    class Vue3Adapter extends BaseAdapter {
+        constructor() {
+            super(...arguments);
+            Object.defineProperty(this, "name", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: 'vue3'
+            });
+            Object.defineProperty(this, "version", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: '1.0.0'
+            });
+            Object.defineProperty(this, "app", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: null
+            });
+        }
+        /**
+         * 安装适配器到 Vue 应用
+         */
+        install(app, options = {}) {
+            this.app = app;
+            this.init(options);
+            // 注册全局属性
+            app.config.globalProperties.$device = this.createReactiveDeviceInfo(options);
+            // 注册组件
+            app.component('DeviceProvider', this.createDeviceProviderComponent());
+            app.component('DeviceInfo', this.createDeviceInfoComponent());
+            // 注册指令
+            this.registerDirectives();
+        }
+        /**
+         * 创建响应式设备信息
+         */
+        createReactiveDeviceInfo(config) {
+            return useDevice(config);
+        }
+        /**
+         * 创建响应式设备类型
+         */
+        createReactiveDeviceType(config) {
+            return useDeviceType(config);
+        }
+        /**
+         * 创建响应式屏幕方向
+         */
+        createReactiveOrientation(config) {
+            return useOrientation(config);
+        }
+        /**
+         * 创建设备信息组件
+         */
+        createDeviceInfoComponent(props) {
+            return {
+                name: 'DeviceInfo',
+                props: {
+                    detailed: {
+                        type: Boolean,
+                        default: false,
+                    },
+                    showLoading: {
+                        type: Boolean,
+                        default: true,
+                    },
+                    config: {
+                        type: Object,
+                        default: () => ({}),
+                    },
+                },
+                setup(props) {
+                    const { deviceInfo, isLoading, error } = useDevice(props.config);
+                    return {
+                        deviceInfo,
+                        isLoading,
+                        error,
+                    };
+                },
+                template: `
+        <div class="ldesign-device-info">
+          <div v-if="isLoading && showLoading" class="loading">
+            检测设备信息中...
+          </div>
+          <div v-else-if="error" class="error">
+            设备检测失败: {{ error.message }}
+          </div>
+          <div v-else class="device-info">
+            <div class="info-item">
+              <span class="label">设备类型:</span>
+              <span class="value">{{ deviceInfo.type }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">屏幕方向:</span>
+              <span class="value">{{ deviceInfo.orientation }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">屏幕尺寸:</span>
+              <span class="value">{{ deviceInfo.width }} × {{ deviceInfo.height }}</span>
+            </div>
+            <div v-if="detailed" class="detailed-info">
+              <div class="info-item">
+                <span class="label">像素比:</span>
+                <span class="value">{{ deviceInfo.pixelRatio }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">触摸设备:</span>
+                <span class="value">{{ deviceInfo.isTouchDevice ? '是' : '否' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `,
+            };
+        }
+        /**
+         * 创建设备提供者组件
+         */
+        createDeviceProviderComponent(props) {
+            return {
+                name: 'DeviceProvider',
+                props: {
+                    config: {
+                        type: Object,
+                        default: () => ({}),
+                    },
+                },
+                setup(props, { slots }) {
+                    const deviceContext = useDevice(props.config);
+                    // 提供设备上下文
+                    vue.provide(DEVICE_CONTEXT_KEY, deviceContext);
+                    return () => slots.default?.();
+                },
+            };
+        }
+        /**
+         * 注册设备相关指令
+         */
+        registerDirectives() {
+            if (!this.app)
+                return;
+            // v-device 指令 - 根据设备类型显示/隐藏
+            this.app.directive('device', this.createDeviceDirective());
+            // v-mobile 指令 - 仅在移动设备显示
+            this.app.directive('mobile', this.createConditionalDirective('mobile'));
+            // v-tablet 指令 - 仅在平板设备显示
+            this.app.directive('tablet', this.createConditionalDirective('tablet'));
+            // v-desktop 指令 - 仅在桌面设备显示
+            this.app.directive('desktop', this.createConditionalDirective('desktop'));
+            // v-portrait 指令 - 仅在竖屏显示
+            this.app.directive('portrait', this.createConditionalDirective('portrait'));
+            // v-landscape 指令 - 仅在横屏显示
+            this.app.directive('landscape', this.createConditionalDirective('landscape'));
+            // v-touch 指令 - 仅在触摸设备显示
+            this.app.directive('touch', this.createConditionalDirective('touch'));
+        }
+        /**
+         * 创建设备指令
+         */
+        createDeviceDirective() {
+            return {
+                mounted(el, binding) {
+                    const { deviceInfo } = useDevice();
+                    const targetDevices = Array.isArray(binding.value) ? binding.value : [binding.value];
+                    const updateVisibility = () => {
+                        const shouldShow = targetDevices.includes(deviceInfo.value.type);
+                        el.style.display = shouldShow ? '' : 'none';
+                    };
+                    updateVisibility();
+                    // 存储更新函数以便清理
+                    el._deviceDirectiveUpdate = updateVisibility;
+                },
+                unmounted(el) {
+                    if (el._deviceDirectiveUpdate) {
+                        delete el._deviceDirectiveUpdate;
+                    }
+                },
+            };
+        }
+        /**
+         * 创建条件渲染指令
+         */
+        createConditionalDirective(condition) {
+            return {
+                mounted(el, binding) {
+                    const { deviceInfo } = useDevice();
+                    const updateVisibility = () => {
+                        let shouldShow = false;
+                        switch (condition) {
+                            case 'mobile':
+                                shouldShow = deviceInfo.value.type === 'mobile';
+                                break;
+                            case 'tablet':
+                                shouldShow = deviceInfo.value.type === 'tablet';
+                                break;
+                            case 'desktop':
+                                shouldShow = deviceInfo.value.type === 'desktop';
+                                break;
+                            case 'portrait':
+                                shouldShow = deviceInfo.value.orientation === 'portrait';
+                                break;
+                            case 'landscape':
+                                shouldShow = deviceInfo.value.orientation === 'landscape';
+                                break;
+                            case 'touch':
+                                shouldShow = deviceInfo.value.isTouchDevice;
+                                break;
+                        }
+                        // 支持取反
+                        if (binding.modifiers.not) {
+                            shouldShow = !shouldShow;
+                        }
+                        el.style.display = shouldShow ? '' : 'none';
+                    };
+                    updateVisibility();
+                    // 存储更新函数以便清理
+                    el._conditionalDirectiveUpdate = updateVisibility;
+                },
+                unmounted(el) {
+                    if (el._conditionalDirectiveUpdate) {
+                        delete el._conditionalDirectiveUpdate;
+                    }
+                },
+            };
+        }
+        /**
+         * 销毁适配器
+         */
+        destroy() {
+            super.destroy();
+            this.app = null;
+        }
+    }
+    /**
+     * Vue3 适配器工厂
+     */
+    class Vue3AdapterFactory {
+        create(config) {
+            return new Vue3Adapter();
+        }
+        isCompatible() {
+            try {
+                // 检查是否在 Vue 3 环境中
+                if (typeof window === 'undefined') {
+                    return false;
+                }
+                const vue = window.Vue;
+                return vue && vue.version && vue.version.startsWith('3.');
+            }
+            catch {
+                return false;
+            }
+        }
+        getSupportedVersions() {
+            return ['3.0.0', '3.1.0', '3.2.0', '3.3.0', '3.4.0'];
+        }
+    }
+    /**
+     * 创建 Vue3 插件
+     */
+    function createVue3Plugin(options = {}) {
+        return {
+            install(app) {
+                const adapter = new Vue3Adapter();
+                adapter.install(app, options);
+            },
         };
     }
 
+    // 适配器类型定义
+    // 自动注册适配器
+    // 注册 Vue3 适配器
+    registerAdapter('vue3', new Vue3AdapterFactory());
+
+    exports.AdapterRegistryImpl = AdapterRegistryImpl;
+    exports.BaseAdapter = BaseAdapter;
     exports.DEFAULT_DEVICE_CONFIG = DEFAULT_DEVICE_CONFIG;
     exports.DeviceDetectorImpl = DeviceDetectorImpl;
+    exports.DeviceProvider = DeviceProvider;
+    exports.FrameworkDetector = FrameworkDetector;
     exports.MEDIA_QUERIES = MEDIA_QUERIES;
     exports.MediaQueryListener = MediaQueryListener;
     exports.ReactiveDeviceListener = ReactiveDeviceListener;
+    exports.Vue3Adapter = Vue3Adapter;
+    exports.Vue3AdapterFactory = Vue3AdapterFactory;
+    exports.checkFrameworkSupport = checkFrameworkSupport;
     exports.createDeviceDetector = createDeviceDetector;
     exports.createMediaQueryListener = createMediaQueryListener;
     exports.createReactiveDeviceListener = createReactiveDeviceListener;
+    exports.createVue3Plugin = createVue3Plugin;
     exports.debounce = debounce;
+    exports.detectAdapter = detectAdapter;
     exports.detectDeviceType = detectDeviceType;
     exports.detectDeviceTypeByScreenSize = detectDeviceTypeByScreenSize;
     exports.detectDeviceTypeByUserAgent = detectDeviceTypeByUserAgent;
     exports.detectOrientation = detectOrientation;
+    exports.getAdapter = getAdapter;
     exports.getDeviceInfo = getDeviceInfo;
     exports.getGlobalDeviceDetector = getGlobalDeviceDetector;
     exports.getPixelRatio = getPixelRatio;
     exports.getScreenOrientation = getScreenOrientation;
     exports.getScreenSize = getScreenSize;
+    exports.getSupportedFrameworks = getSupportedFrameworks;
     exports.getUserAgent = getUserAgent;
+    exports.globalAdapterRegistry = globalAdapterRegistry;
     exports.isTouchDevice = isTouchDevice;
     exports.onDeviceChange = onDeviceChange;
+    exports.registerAdapter = registerAdapter;
     exports.throttle = throttle;
     exports.useBreakpoints = useBreakpoints;
     exports.useCustomMediaQuery = useCustomMediaQuery;

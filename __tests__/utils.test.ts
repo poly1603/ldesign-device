@@ -1,16 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  getScreenSize,
-  getPixelRatio,
-  isTouchDevice,
-  getUserAgent,
-  detectDeviceTypeByUserAgent,
-  detectDeviceTypeByScreenSize,
-  detectDeviceType,
-  detectOrientation,
-  getScreenOrientation,
   debounce,
-  throttle
+  detectDeviceTypeByScreenSize,
+  detectDeviceTypeByUserAgent,
+  detectOrientation,
+  getPixelRatio,
+  getScreenOrientation,
+  getScreenSize,
+  getUserAgent,
+  isTouchDevice,
+  throttle,
 } from '../src/utils'
 import { DeviceType, Orientation } from '../src/types'
 
@@ -19,29 +18,29 @@ const mockWindow = {
   innerWidth: 1920,
   innerHeight: 1080,
   devicePixelRatio: 2,
-  orientation: 0
+  orientation: 0,
 }
 
 const mockDocument = {
   documentElement: {
     clientWidth: 1920,
-    clientHeight: 1080
+    clientHeight: 1080,
   },
   body: {
     clientWidth: 1920,
-    clientHeight: 1080
-  }
+    clientHeight: 1080,
+  },
 }
 
 const mockNavigator = {
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  maxTouchPoints: 0
+  maxTouchPoints: 0,
 }
 
 const mockScreen = {
   orientation: {
-    angle: 0
-  }
+    angle: 0,
+  },
 }
 
 describe('utils', () => {

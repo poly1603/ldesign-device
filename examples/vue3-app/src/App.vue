@@ -1,35 +1,3 @@
-<template>
-  <LDeviceProvider>
-    <div id="app" :class="appClass">
-      <!-- 导航栏 -->
-      <AppHeader />
-      
-      <!-- 主要内容 -->
-      <main class="main">
-        <div :class="containerClass">
-          <!-- 设备信息展示 -->
-          <DeviceInfoSection />
-          
-          <!-- 功能演示 -->
-          <FeaturesDemo />
-          
-          <!-- 指令演示 -->
-          <DirectivesDemo />
-          
-          <!-- 响应式布局演示 -->
-          <ResponsiveLayoutDemo />
-          
-          <!-- 性能优化演示 -->
-          <PerformanceDemo />
-        </div>
-      </main>
-      
-      <!-- 页脚 -->
-      <AppFooter />
-    </div>
-  </LDeviceProvider>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useDevice } from '@ldesign/device'
@@ -46,16 +14,48 @@ const { isMobile, isTablet, isDesktop } = useDevice()
 const appClass = computed(() => ({
   'app-mobile': isMobile.value,
   'app-tablet': isTablet.value,
-  'app-desktop': isDesktop.value
+  'app-desktop': isDesktop.value,
 }))
 
 const containerClass = computed(() => ({
   'container': true,
   'container-mobile': isMobile.value,
   'container-tablet': isTablet.value,
-  'container-desktop': isDesktop.value
+  'container-desktop': isDesktop.value,
 }))
 </script>
+
+<template>
+  <LDeviceProvider>
+    <div id="app" :class="appClass">
+      <!-- 导航栏 -->
+      <AppHeader />
+
+      <!-- 主要内容 -->
+      <main class="main">
+        <div :class="containerClass">
+          <!-- 设备信息展示 -->
+          <DeviceInfoSection />
+
+          <!-- 功能演示 -->
+          <FeaturesDemo />
+
+          <!-- 指令演示 -->
+          <DirectivesDemo />
+
+          <!-- 响应式布局演示 -->
+          <ResponsiveLayoutDemo />
+
+          <!-- 性能优化演示 -->
+          <PerformanceDemo />
+        </div>
+      </main>
+
+      <!-- 页脚 -->
+      <AppFooter />
+    </div>
+  </LDeviceProvider>
+</template>
 
 <style scoped>
 #app {
