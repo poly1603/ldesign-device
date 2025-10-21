@@ -2,29 +2,17 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu({
   typescript: true,
-  vue: true,
-  react: false,
-  stylistic: false,
-  ignores: [
-    'dist',
-    'es',
-    'lib',
-    'types',
-    'node_modules',
-    '__tests__',
-    'tests',
-    'test',
-    'e2e',
-    'examples',
-    'docs',
-    '**/*.md',
-    'package.json',
-  ],
+  vue: false,
+  jsonc: true,
+  markdown: true,
+  formatters: {
+    css: true,
+    html: true,
+    markdown: 'prettier',
+  },
   rules: {
-    'ts/no-explicit-any': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    'ts/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
+    // 自定义规则
     'no-console': 'off',
+    'no-debugger': 'warn',
   },
 })
