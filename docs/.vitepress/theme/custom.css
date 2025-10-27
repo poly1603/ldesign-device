@@ -1,0 +1,95 @@
+/**
+ * VitePress 自定义样式
+ */
+
+:root {
+  --vp-c-brand: #4facfe;
+  --vp-c-brand-light: #6fbfff;
+  --vp-c-brand-lighter: #8fcfff;
+  --vp-c-brand-dark: #3f9cee;
+  --vp-c-brand-darker: #2f8cde;
+
+  --vp-button-brand-border: var(--vp-c-brand-light);
+  --vp-button-brand-text: var(--vp-c-white);
+  --vp-button-brand-bg: var(--vp-c-brand);
+  --vp-button-brand-hover-border: var(--vp-c-brand-light);
+  --vp-button-brand-hover-text: var(--vp-c-white);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-light);
+  --vp-button-brand-active-border: var(--vp-c-brand-light);
+  --vp-button-brand-active-text: var(--vp-c-white);
+  --vp-button-brand-active-bg: var(--vp-button-brand-bg);
+}
+
+.dark {
+  --vp-c-brand: #6fbfff;
+  --vp-c-brand-light: #8fcfff;
+  --vp-c-brand-lighter: #afdffe;
+  --vp-c-brand-dark: #4facfe;
+  --vp-c-brand-darker: #3f9cee;
+}
+
+/* 自定义代码块样式 */
+.vp-doc div[class*='language-'] {
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+/* 自定义表格样式 */
+.vp-doc table {
+  display: block;
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+/* 自定义提示框样式 */
+.vp-doc .custom-block {
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+/* 响应式图片 */
+.vp-doc img {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 首页 Hero 样式增强 */
+.VPHero .name {
+  background: linear-gradient(120deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 功能卡片样式 */
+.vp-doc .feature-card {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  transition: all 0.3s ease;
+}
+
+.vp-doc .feature-card:hover {
+  border-color: var(--vp-c-brand);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 代码高亮增强 */
+.vp-doc code {
+  background-color: var(--vp-code-bg);
+  border-radius: 4px;
+  padding: 3px 6px;
+  font-size: 0.875em;
+}
+
+/* 链接样式 */
+.vp-doc a {
+  transition: color 0.25s;
+}
+
+.vp-doc a:hover {
+  color: var(--vp-c-brand-light);
+}
