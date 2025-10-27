@@ -257,13 +257,37 @@ export class EventEmitter<
    * 触发事件（支持通配符监听器）
    *
    * 优化: 按优先级顺序执行监听器，避免创建新数组
+   * 性能优化：为单监听器场景提供快速路径
    */
   emit<K extends keyof T>(event: K, data: T[K]): this {
     const listeners = this.events.get(event as string)
     const hasListeners = listeners && listeners.length > 0
     const hasWildcard = this.wildcardListeners.length > 0
-    
+
+    // 快速路径：没有监听器直接返回
     if (!hasListeners && !hasWildcard) {
+      return this
+    }
+
+    // 快速路径：单个监听器且无通配符监听器（避免迭代和排序开销）
+    if (listeners && listeners.length === 1 && !hasWildcard) {
+      const wrapper = listeners[0]
+      try {
+        wrapper.listener(data)
+        if (wrapper.once) {
+          this.events.delete(event as string)
+          this.isSorted.delete(event as string)
+        }
+      }
+      catch (error) {
+        this.handleListenerError(error, event as string)
+      }
+
+      if (this.enablePerformanceTracking) {
+        this.performanceMetrics.totalEmits++
+        this.performanceMetrics.totalListenerCalls++
+      }
+
       return this
     }
 
@@ -272,7 +296,7 @@ export class EventEmitter<
       listeners?.sort((a, b) => b.priority - a.priority)
       this.isSorted.set(event as string, true)
     }
-    
+
     // 排序通配符监听器（仅在需要时，且避免重复排序）
     if (hasWildcard && this.wildcardListeners.length > 1) {
       // 只在添加新监听器后第一次触发时排序
@@ -289,7 +313,7 @@ export class EventEmitter<
       const alpha = 0.1
       this.performanceMetrics.averageListenersPerEvent
         = this.performanceMetrics.averageListenersPerEvent * (1 - alpha)
-          + totalListeners * alpha
+        + totalListeners * alpha
     }
 
     // 记录需要移除的一次性监听器（复用数组以减少分配）
@@ -372,13 +396,13 @@ export class EventEmitter<
       if (eventStr.includes('*')) {
         const prefix = eventStr.replace('*', '')
         const keysToDelete: string[] = []
-        
+
         for (const key of this.events.keys()) {
           if (String(key).startsWith(prefix)) {
             keysToDelete.push(String(key))
           }
         }
-        
+
         for (const key of keysToDelete) {
           this.events.delete(key)
           this.isSorted.delete(key)

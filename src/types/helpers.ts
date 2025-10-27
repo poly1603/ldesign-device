@@ -91,3 +91,97 @@ export interface DirectiveBinding<T = unknown> {
 
 // HTML Element 扩展类型
 export type ExtendedHTMLElement = HTMLElement & Record<string, unknown>
+
+// Wake Lock API 类型
+export interface WakeLockNavigator extends Navigator {
+  wakeLock?: {
+    request: (type: 'screen') => Promise<WakeLockSentinel>
+  }
+}
+
+export interface WakeLockSentinel extends EventTarget {
+  readonly released: boolean
+  readonly type: 'screen'
+  release(): Promise<void>
+}
+
+// Screen Orientation API 类型
+export interface ScreenOrientationAPI {
+  type: string
+  angle: number
+  lock: (orientation: string) => Promise<void>
+  unlock: () => void
+  addEventListener: (type: string, listener: () => void) => void
+  removeEventListener: (type: string, listener: () => void) => void
+}
+
+export interface ScreenWithOrientation extends Screen {
+  orientation: ScreenOrientationAPI
+  refreshRate?: number
+}
+
+// Media Capabilities API 类型
+export interface MediaCapabilitiesAPI {
+  decodingInfo: (config: MediaDecodingConfiguration) => Promise<MediaCapabilitiesDecodingInfo>
+  encodingInfo: (config: MediaEncodingConfiguration) => Promise<MediaCapabilitiesEncodingInfo>
+}
+
+export interface MediaDecodingConfiguration {
+  type: 'file' | 'media-source'
+  video?: VideoConfiguration
+  audio?: AudioConfiguration
+}
+
+export interface MediaEncodingConfiguration {
+  type: 'record' | 'transmission'
+  video?: VideoConfiguration
+  audio?: AudioConfiguration
+}
+
+export interface VideoConfiguration {
+  contentType: string
+  width: number
+  height: number
+  bitrate: number
+  framerate: number
+}
+
+export interface AudioConfiguration {
+  contentType: string
+  channels?: number
+  bitrate?: number
+  samplerate?: number
+}
+
+export interface MediaCapabilitiesDecodingInfo {
+  supported: boolean
+  smooth: boolean
+  powerEfficient: boolean
+}
+
+export interface MediaCapabilitiesEncodingInfo {
+  supported: boolean
+  smooth: boolean
+  powerEfficient: boolean
+}
+
+export interface NavigatorWithMediaCapabilities extends Navigator {
+  mediaCapabilities: MediaCapabilitiesAPI
+}
+
+// Clipboard API 类型
+export interface ClipboardAPI {
+  writeText: (text: string) => Promise<void>
+  readText: () => Promise<string>
+  write?: (data: ClipboardItem[]) => Promise<void>
+  read?: () => Promise<ClipboardItem[]>
+}
+
+export interface NavigatorWithClipboard extends Navigator {
+  clipboard: ClipboardAPI
+}
+
+// Vibration API 类型
+export interface NavigatorWithVibration extends Navigator {
+  vibrate: (pattern: number | number[]) => boolean
+}

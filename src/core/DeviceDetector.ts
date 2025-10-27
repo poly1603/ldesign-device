@@ -19,6 +19,7 @@ import {
   parseOS,
 } from '../utils'
 import { memoryManager, SafeTimerManager } from '../utils/MemoryManager'
+import { PerformanceBudget } from '../utils/PerformanceBudget'
 import { EventEmitter } from './EventEmitter'
 import { ModuleLoader } from './ModuleLoader'
 
@@ -58,7 +59,9 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
   private resizeHandler?: () => void
   private orientationHandler?: () => void
   private isDestroyed = false
+  private isInSafeMode = false
   private timerManager: SafeTimerManager
+  private performanceBudget: PerformanceBudget
 
   // 性能优化：缓存计算结果
   private cachedUserAgent?: string
@@ -141,12 +144,45 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
     this.timerManager = new SafeTimerManager()
     this.moduleLoader = new ModuleLoader()
+    this.performanceBudget = new PerformanceBudget({
+      enableWarnings: options.debug ?? false,
+      collectStats: true,
+    })
     this.currentDeviceInfo = this.detectDevice()
 
     this.setupEventListeners()
 
-    // 注册内存清理回调
-    memoryManager.addGCCallback(() => this.cleanupCache())
+    // 注册内存清理回调（使用 requestIdleCallback 优化）
+    memoryManager.addGCCallback(() => this.scheduleCleanup())
+  }
+
+  /**
+   * 调度缓存清理（使用 requestIdleCallback 优化非关键任务）
+   * 
+   * 性能优化：在浏览器空闲时执行清理，避免阻塞主线程
+   */
+  private scheduleCleanup(): void {
+    if (typeof window === 'undefined') {
+      this.cleanupCache()
+      return
+    }
+
+    // 优先使用 requestIdleCallback
+    if ('requestIdleCallback' in window) {
+      (window as Window & { requestIdleCallback: (callback: () => void, options?: { timeout: number }) => number }).requestIdleCallback(() => {
+        if (!this.isDestroyed) {
+          this.cleanupCache()
+        }
+      }, { timeout: 2000 })
+    }
+    else {
+      // 降级到 setTimeout
+      setTimeout(() => {
+        if (!this.isDestroyed) {
+          this.cleanupCache()
+        }
+      }, 1000)
+    }
   }
 
   /**
@@ -250,9 +286,9 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
     // 桥接模块事件到 DeviceDetector，自适应各模块事件名称
     try {
       const unsubs: Array<() => void> = []
-    const withEvents = instance as Partial<{ on: (event: string, handler: (info: unknown) => void) => void; off: (event: string, handler: (info: unknown) => void) => void }>
-    const hasOn = typeof withEvents.on === 'function'
-    const hasOff = typeof withEvents.off === 'function'
+      const withEvents = instance as Partial<{ on: (event: string, handler: (info: unknown) => void) => void; off: (event: string, handler: (info: unknown) => void) => void }>
+      const hasOn = typeof withEvents.on === 'function'
+      const hasOff = typeof withEvents.off === 'function'
 
       if (hasOn && hasOff) {
         if (name === 'network') {
@@ -348,10 +384,10 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
     // 清理缓存
     this.cleanupCache()
-    
+
     // 清理性能指标历史
     this.metricsHistory.length = 0
-    
+
     // 移除内存管理器回调
     memoryManager.removeGCCallback(() => this.cleanupCache())
   }
@@ -388,6 +424,8 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 处理检测错误
+   * 
+   * 错误恢复机制：当错误次数超过阈值时，进入安全模式
    */
   private handleDetectionError(error: unknown): void {
     this.errorCount++
@@ -395,14 +433,48 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
     console.warn('Device detection error:', error)
 
-    // 如果错误次数过多，触发错误事件
+    // 如果错误次数过多，触发错误事件并进入安全模式
     if (this.errorCount >= this.maxErrors) {
       this.emit('error', {
         message: 'Too many detection errors',
         count: this.errorCount,
         lastError: error as unknown,
       } as { message: string, count: number, lastError: unknown })
+
+      // 进入安全模式
+      this.enterSafeMode()
     }
+  }
+
+  /**
+   * 进入安全模式
+   * 
+   * 当检测器遇到过多错误时，禁用非关键功能以防止进一步的问题
+   * 这确保应用可以继续运行，即使设备检测功能受限
+   */
+  private enterSafeMode(): void {
+    if (this.isInSafeMode) {
+      return // 已经在安全模式，避免重复执行
+    }
+
+    this.isInSafeMode = true
+    console.warn('DeviceDetector entering safe mode due to excessive errors')
+
+    // 禁用事件监听器以防止进一步的错误
+    this.removeEventListeners()
+
+    // 触发安全模式事件，让应用知道设备检测功能受限
+    this.emit('safeMode' as keyof DeviceDetectorEvents, {
+      errorCount: this.errorCount,
+      timestamp: Date.now(),
+    } as DeviceDetectorEvents[keyof DeviceDetectorEvents])
+  }
+
+  /**
+   * 检查是否处于安全模式
+   */
+  isInSafeModeState(): boolean {
+    return this.isInSafeMode
   }
 
   /**
@@ -496,6 +568,9 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
       const detectionTime = performance.now() - startTime
       this.updatePerformanceMetrics(detectionTime)
 
+      // 性能预算检查
+      this.performanceBudget.checkBudget('detectionTime', detectionTime)
+
       // 重置错误计数
       this.errorCount = 0
 
@@ -514,62 +589,100 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
    */
   private detectWebGL(): boolean {
     const now = Date.now()
-    
+    const startTime = performance.now()
+
     // 检查缓存是否有效（优化：直接比较，避免多余计算）
-    if (this.cachedWebGLSupport !== undefined && 
-        this.webglCacheExpireTime > 0 &&
-        now - this.webglCacheExpireTime < this.webglCacheLifetime) {
+    if (this.cachedWebGLSupport !== undefined &&
+      this.webglCacheExpireTime > 0 &&
+      now - this.webglCacheExpireTime < this.webglCacheLifetime) {
       return this.cachedWebGLSupport
     }
 
     try {
-      // 从池中获取或创建canvas（优化：减少条件判断）
-      const canvas = DeviceDetector.canvasPool.pop() || document.createElement('canvas')
-      
-      // 最小尺寸以减少内存占用
-      canvas.width = 1
-      canvas.height = 1
-      
-      // 尝试获取WebGL上下文（优化：使用更宽松的配置）
-      const gl = canvas.getContext('webgl', { 
-        failIfMajorPerformanceCaveat: false,
-        antialias: false,
-        depth: false,
-        stencil: false
-      }) || canvas.getContext('experimental-webgl', {
-        failIfMajorPerformanceCaveat: false,
-        antialias: false,
-        depth: false,
-        stencil: false
-      })
-      
-      this.cachedWebGLSupport = !!gl
+      // 性能优化：优先使用 OffscreenCanvas（支持的浏览器中）
+      if (typeof OffscreenCanvas !== 'undefined') {
+        const offscreenCanvas = new OffscreenCanvas(1, 1)
+        const gl = offscreenCanvas.getContext('webgl', {
+          failIfMajorPerformanceCaveat: false,
+          antialias: false,
+          depth: false,
+          stencil: false
+        }) || offscreenCanvas.getContext('webgl2', {
+          failIfMajorPerformanceCaveat: false,
+          antialias: false,
+          depth: false,
+          stencil: false
+        })
 
-      // 清理WebGL上下文以释放GPU内存
-      if (gl && 'getExtension' in gl) {
-        const loseContext = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context')
-        loseContext?.loseContext()
+        this.cachedWebGLSupport = !!gl
+
+        // 清理WebGL上下文以释放GPU内存
+        if (gl && 'getExtension' in gl) {
+          const loseContext = (gl as WebGLRenderingContext | WebGL2RenderingContext).getExtension('WEBGL_lose_context')
+          loseContext?.loseContext()
+        }
       }
+      else {
+        // 降级到普通 Canvas（从对象池中获取或创建）
+        const canvas = DeviceDetector.canvasPool.pop() || document.createElement('canvas')
 
-      // 将canvas返回池中（优化：重置尺寸以节省内存）
-      if (DeviceDetector.canvasPool.length < DeviceDetector.maxCanvasPool) {
+        // 最小尺寸以减少内存占用
         canvas.width = 1
         canvas.height = 1
-        DeviceDetector.canvasPool.push(canvas)
+
+        // 尝试获取WebGL上下文（优化：使用更宽松的配置）
+        const gl = canvas.getContext('webgl', {
+          failIfMajorPerformanceCaveat: false,
+          antialias: false,
+          depth: false,
+          stencil: false
+        }) || canvas.getContext('experimental-webgl', {
+          failIfMajorPerformanceCaveat: false,
+          antialias: false,
+          depth: false,
+          stencil: false
+        })
+
+        this.cachedWebGLSupport = !!gl
+
+        // 清理WebGL上下文以释放GPU内存
+        if (gl && 'getExtension' in gl) {
+          const loseContext = (gl as WebGLRenderingContext).getExtension('WEBGL_lose_context')
+          loseContext?.loseContext()
+        }
+
+        // 将canvas返回池中（优化：重置尺寸以节省内存）
+        if (DeviceDetector.canvasPool.length < DeviceDetector.maxCanvasPool) {
+          canvas.width = 1
+          canvas.height = 1
+          DeviceDetector.canvasPool.push(canvas)
+        }
       }
 
       this.webglCacheExpireTime = now
+
+      // 性能预算检查
+      const detectionTime = performance.now() - startTime
+      this.performanceBudget.checkBudget('webglDetectionTime', detectionTime)
+
       return this.cachedWebGLSupport
     }
     catch {
       this.cachedWebGLSupport = false
       this.webglCacheExpireTime = now
+
+      // 性能预算检查
+      const detectionTime = performance.now() - startTime
+      this.performanceBudget.checkBudget('webglDetectionTime', detectionTime)
+
       return false
     }
   }
 
   /**
    * 设置事件监听器
+   * 
+   * 性能优化：使用 passive 事件监听器减少滚动/缩放延迟
    */
   private setupEventListeners(): void {
     if (typeof window === 'undefined')
@@ -583,7 +696,11 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
         }
       }, this.options.debounceDelay ?? 100)
 
-      window.addEventListener('resize', this.resizeHandler, { passive: true })
+      // 优化：明确指定 passive 和 capture，提升性能
+      window.addEventListener('resize', this.resizeHandler, {
+        passive: true,
+        capture: false
+      })
     }
 
     // 设备方向监听
@@ -597,12 +714,14 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
       // 监听 orientationchange 事件
       window.addEventListener('orientationchange', this.orientationHandler, {
         passive: true,
+        capture: false,
       })
 
       // 同时监听 resize 事件作为备选方案
       if (!this.options.enableResize) {
         window.addEventListener('resize', this.orientationHandler, {
           passive: true,
+          capture: false,
         })
       }
     }

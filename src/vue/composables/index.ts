@@ -19,3 +19,18 @@ export { useDevice, useNetwork } from './useDevice'
 export { useGeolocation } from './useGeolocation'
 // 屏幕方向检测
 export { useOrientation } from './useOrientation'
+
+// 新增：媒体能力检测
+export { useMediaCapabilities } from './useMediaCapabilities'
+
+// 新增：屏幕常亮控制
+export { useWakeLock } from './useWakeLock'
+
+// 新增：振动控制
+export { useVibration } from './useVibration'
+
+// 新增：剪贴板操作
+export { useClipboard } from './useClipboard'
+
+// 新增：屏幕方向锁定
+export { useOrientationLock } from './useOrientationLock'

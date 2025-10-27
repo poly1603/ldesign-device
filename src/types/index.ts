@@ -23,6 +23,17 @@ export type NetworkType =
   | 'unknown'
 
 /**
+ * 网络连接有效类型（更精确的类型定义）
+ */
+export type NetworkConnectionType =
+  | 'slow-2g'
+  | '2g'
+  | '3g'
+  | '4g'
+  | '5g'
+  | 'unknown'
+
+/**
  * 网络连接状态
  */
 export type NetworkStatus = 'online' | 'offline'
@@ -44,6 +55,8 @@ export interface DeviceDetectorOptions {
   debounceDelay?: number
   /** 要加载的模块列表 */
   modules?: string[]
+  /** 是否启用调试模式（性能预算警告等） */
+  debug?: boolean
 }
 
 /**
@@ -110,8 +123,8 @@ export interface NetworkInfo {
   saveData?: boolean
   /** 是否在线（兼容性属性） */
   online?: boolean
-  /** 有效连接类型（兼容性属性） */
-  effectiveType?: string
+  /** 有效连接类型（使用精确类型） */
+  effectiveType?: NetworkConnectionType | string
   /** 是否支持网络连接API */
   supported?: boolean
 }
@@ -170,6 +183,8 @@ export interface DeviceDetectorEvents extends Record<string, unknown> {
   positionChange: GeolocationInfo
   /** 检测错误事件（内部错误过多时触发） */
   error: { message: string, count: number, lastError: unknown }
+  /** 安全模式事件（错误过多时进入安全模式） */
+  safeMode: { errorCount: number, timestamp: number }
 }
 
 /**

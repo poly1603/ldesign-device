@@ -51,6 +51,22 @@ export { NetworkModule } from './modules/NetworkModule'
 export { PerformanceModule } from './modules/PerformanceModule'
 export type { DevicePerformanceInfo, PerformanceModuleEvents, PerformanceTestOptions } from './modules/PerformanceModule'
 
+// 新增模块
+export { MediaCapabilitiesModule } from './modules/MediaCapabilitiesModule'
+export type { MediaCapabilityInfo, MediaConfig, MediaCapabilitiesEvents, HDRSupport } from './modules/MediaCapabilitiesModule'
+
+export { WakeLockModule } from './modules/WakeLockModule'
+export type { WakeLockEvents } from './modules/WakeLockModule'
+
+export { VibrationModule } from './modules/VibrationModule'
+export type { VibrationEvents, VibrationPatternName } from './modules/VibrationModule'
+
+export { ClipboardModule } from './modules/ClipboardModule'
+export type { ClipboardEvents } from './modules/ClipboardModule'
+
+export { OrientationLockModule } from './modules/OrientationLockModule'
+export type { OrientationLockEvents } from './modules/OrientationLockModule'
+
 // 类型定义
 export type {
   BatteryInfo,

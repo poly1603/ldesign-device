@@ -14,10 +14,10 @@ import { asyncPool } from '../utils'
 export class ModuleLoader implements IModuleLoader {
   private modules: Map<string, DeviceModule> = new Map()
   private loadingPromises: Map<string, Promise<unknown>> = new Map()
-  
+
   // 模块依赖关系映射
   private dependencies: Map<string, string[]> = new Map()
-  
+
   // 模块优先级
   private priorities: Map<string, number> = new Map()
 
@@ -218,13 +218,13 @@ export class ModuleLoader implements IModuleLoader {
     // 优化：使用更高效的方式进行排序和清理
     // 将Map转换为数组进行排序
     const entries = Array.from(this.loadingStats.entries())
-    
+
     // 按最后加载时间降序排序（最近的在前）
     entries.sort((a, b) => b[1].lastLoadTime - a[1].lastLoadTime)
 
     // 清空Map并只保留最近的maxStatsEntries个条目
     this.loadingStats.clear()
-    
+
     // 优化：使用for循环而不是forEach以提高性能
     const keepCount = Math.min(this.maxStatsEntries, entries.length)
     for (let i = 0; i < keepCount; i++) {
@@ -262,6 +262,21 @@ export class ModuleLoader implements IModuleLoader {
             break
           case 'media':
             module = await this.loadMediaModule()
+            break
+          case 'mediaCapabilities':
+            module = await this.loadMediaCapabilitiesModule()
+            break
+          case 'wakeLock':
+            module = await this.loadWakeLockModule()
+            break
+          case 'vibration':
+            module = await this.loadVibrationModule()
+            break
+          case 'clipboard':
+            module = await this.loadClipboardModule()
+            break
+          case 'orientationLock':
+            module = await this.loadOrientationLockModule()
             break
           default:
             // 对未知模块不进行重试，直接抛出原始错误，符合测试期望
@@ -352,6 +367,56 @@ export class ModuleLoader implements IModuleLoader {
   private async loadMediaModule(): Promise<DeviceModule> {
     const { MediaModule } = await import('../modules/MediaModule')
     const module = new MediaModule()
+    await module.init()
+    return module
+  }
+
+  /**
+   * 加载媒体能力检测模块
+   */
+  private async loadMediaCapabilitiesModule(): Promise<DeviceModule> {
+    const { MediaCapabilitiesModule } = await import('../modules/MediaCapabilitiesModule')
+    const module = new MediaCapabilitiesModule()
+    await module.init()
+    return module
+  }
+
+  /**
+   * 加载 Wake Lock 模块
+   */
+  private async loadWakeLockModule(): Promise<DeviceModule> {
+    const { WakeLockModule } = await import('../modules/WakeLockModule')
+    const module = new WakeLockModule()
+    await module.init()
+    return module
+  }
+
+  /**
+   * 加载振动模块
+   */
+  private async loadVibrationModule(): Promise<DeviceModule> {
+    const { VibrationModule } = await import('../modules/VibrationModule')
+    const module = new VibrationModule()
+    await module.init()
+    return module
+  }
+
+  /**
+   * 加载剪贴板模块
+   */
+  private async loadClipboardModule(): Promise<DeviceModule> {
+    const { ClipboardModule } = await import('../modules/ClipboardModule')
+    const module = new ClipboardModule()
+    await module.init()
+    return module
+  }
+
+  /**
+   * 加载屏幕方向锁定模块
+   */
+  private async loadOrientationLockModule(): Promise<DeviceModule> {
+    const { OrientationLockModule } = await import('../modules/OrientationLockModule')
+    const module = new OrientationLockModule()
     await module.init()
     return module
   }

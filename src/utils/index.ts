@@ -8,22 +8,26 @@ import type { DeviceType, Orientation } from '../types'
  * - 支持TTL过期
  * - 添加性能统计
  * - 惰性删除过期项以提高性能
+ * - 内存压力感知，自动调整缓存大小
  */
 class LRUCache<K, V> {
   private cache = new Map<K, { value: V, timestamp: number }>()
   private maxSize: number
   private ttl: number // 缓存过期时间(毫秒)
+  private enableMemoryPressureDetection: boolean
 
   // 性能统计
   private stats = {
     hits: 0,
     misses: 0,
     evictions: 0,
+    pressureDetections: 0,
   }
 
-  constructor(maxSize = 50, ttl = 300000) { // 默认5分钟过期
+  constructor(maxSize = 50, ttl = 300000, enableMemoryPressure = true) { // 默认5分钟过期
     this.maxSize = maxSize
     this.ttl = ttl
+    this.enableMemoryPressureDetection = enableMemoryPressure
   }
 
   get(key: K): V | undefined {
@@ -56,7 +60,12 @@ class LRUCache<K, V> {
 
   set(key: K, value: V): void {
     const now = Date.now()
-    
+
+    // 内存压力检测
+    if (this.enableMemoryPressureDetection) {
+      this.checkMemoryPressure()
+    }
+
     if (this.cache.has(key)) {
       this.cache.delete(key)
     }
@@ -71,9 +80,73 @@ class LRUCache<K, V> {
     this.cache.set(key, { value, timestamp: now })
   }
 
+  /**
+   * 检测内存压力并自动调整缓存大小
+   * 
+   * 当内存使用率超过90%时，主动清理50%的缓存
+   */
+  private checkMemoryPressure(): void {
+    // 只在浏览器环境且支持 performance.memory 时检测
+    if (
+      typeof performance === 'undefined'
+      || !('memory' in performance)
+    ) {
+      return
+    }
+
+    const memory = (performance as Performance & {
+      memory?: {
+        usedJSHeapSize: number
+        jsHeapSizeLimit: number
+      }
+    }).memory
+
+    if (!memory) {
+      return
+    }
+
+    const usage = memory.usedJSHeapSize / memory.jsHeapSizeLimit
+
+    // 内存使用率超过90%，触发清理
+    if (usage > 0.9) {
+      this.stats.pressureDetections++
+      const targetSize = Math.floor(this.cache.size * 0.5)
+      this.shrink(targetSize)
+    }
+  }
+
+  /**
+   * 缩小缓存到目标大小
+   * 
+   * @param targetSize - 目标缓存大小
+   */
+  private shrink(targetSize: number): void {
+    if (targetSize >= this.cache.size) {
+      return
+    }
+
+    // 删除最旧的项直到达到目标大小
+    const keysToDelete: K[] = []
+    let count = 0
+    const deleteCount = this.cache.size - targetSize
+
+    for (const key of this.cache.keys()) {
+      if (count >= deleteCount) {
+        break
+      }
+      keysToDelete.push(key)
+      count++
+    }
+
+    for (const key of keysToDelete) {
+      this.cache.delete(key)
+      this.stats.evictions++
+    }
+  }
+
   clear(): void {
     this.cache.clear()
-    this.stats = { hits: 0, misses: 0, evictions: 0 }
+    this.stats = { hits: 0, misses: 0, evictions: 0, pressureDetections: 0 }
   }
 
   /**
@@ -92,7 +165,7 @@ class LRUCache<K, V> {
    */
   cleanup(): void {
     const now = Date.now()
-    
+
     // 优化：直接在迭代中删除，避免创建临时数组
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.ttl) {
@@ -330,7 +403,7 @@ export function isMobileDevice(userAgent?: string): boolean {
 
   const ua
     = userAgent
-      || (typeof window !== 'undefined' ? window.navigator.userAgent : '')
+    || (typeof window !== 'undefined' ? window.navigator.userAgent : '')
   const mobileRegex
     = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
   return mobileRegex.test(ua)
@@ -502,7 +575,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
 export function generateId(prefix?: string): string {
   const id
     = Math.random().toString(36).substring(2, 15)
-      + Math.random().toString(36).substring(2, 15)
+    + Math.random().toString(36).substring(2, 15)
   return prefix ? `${prefix}-${id}` : id
 }
 
@@ -993,6 +1066,15 @@ export function isEmpty(value: unknown): boolean {
 
 // 导出内存管理相关工具
 export * from './MemoryManager'
+
+// 导出性能预算监控工具
+export * from './PerformanceBudget'
+
+// 导出设备指纹生成工具
+export * from './DeviceFingerprint'
+
+// 导出自适应性能配置工具
+export * from './AdaptivePerformance'
 
 
 
