@@ -1,0 +1,61 @@
+{
+  "name": "@ldesign/device-network",
+  "version": "0.1.0",
+  "description": "Network connection detection module for device detection library",
+  "keywords": [
+    "network",
+    "device",
+    "connection",
+    "online",
+    "offline",
+    "typescript"
+  ],
+  "author": "ldesign",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./es/index.d.ts",
+      "import": "./es/index.js",
+      "require": "./lib/index.cjs"
+    }
+  },
+  "main": "./lib/index.cjs",
+  "module": "./es/index.js",
+  "types": "./es/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "es",
+    "lib",
+    "dist"
+  ],
+  "scripts": {
+    "build": "ldesign-builder build -f esm,cjs,umd,dts",
+    "dev": "ldesign-builder build -f esm,cjs,dts --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf es lib dist"
+  },
+  "dependencies": {
+    "@ldesign/device-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@ldesign/builder": "workspace:../../../../../../tools/builder",
+    "@ldesign/launcher": "workspace:../../../../../../tools/launcher",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.18.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+

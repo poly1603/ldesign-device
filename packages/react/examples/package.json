@@ -1,0 +1,24 @@
+{
+  "name": "@ldesign/device-react-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ldesign-launcher dev",
+    "build": "ldesign-launcher build",
+    "preview": "ldesign-launcher preview"
+  },
+  "dependencies": {
+    "@ldesign/device-react": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@ldesign/launcher": "workspace:../../../../../../../tools/launcher",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.7.3"
+  }
+}
+

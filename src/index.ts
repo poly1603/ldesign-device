@@ -1,105 +1,45 @@
-import type { DeviceDetectorOptions } from './types'
-// 核心类
-// 工厂函数
-import { DeviceDetector } from './core/DeviceDetector'
-
-export { DeviceDetector } from './core/DeviceDetector'
-// 默认导出
-export { DeviceDetector as default } from './core/DeviceDetector'
-export { EventEmitter } from './core/EventEmitter'
-
 /**
- * 创建设备检测器实例的工厂函数
+ * @ldesign/device
  * 
- * @param options - 设备检测器配置选项
- * @returns DeviceDetector 实例
+ * 完整的设备检测库 - 聚合所有功能模块
  * 
- * @example
- * ```typescript
- * // 使用默认配置
- * const detector = createDeviceDetector()
+ * 注意：这是主包，包含原有的完整功能。
+ * 新的模块化架构位于 packages/ 目录下。
  * 
- * // 使用自定义配置
- * const detector = createDeviceDetector({
- *   enableResize: true,
- *   enableOrientation: true,
- *   modules: ['network', 'battery']
- * })
- * ```
+ * 推荐使用模块化的子包：
+ * - @ldesign/device-core - 核心功能
+ * - @ldesign/device-battery - 电池检测
+ * - @ldesign/device-network - 网络检测
+ * - @ldesign/device-vue - Vue 3 适配
+ * - @ldesign/device-react - React 18+ 适配
+ * - @ldesign/device-solid - Solid.js 适配
+ * 
+ * @packageDocumentation
  */
-export function createDeviceDetector(options?: DeviceDetectorOptions): DeviceDetector {
-  return new DeviceDetector(options)
-}
 
-export { ModuleLoader } from './core/ModuleLoader'
-// Engine集成
-export * from './engine'
-export { BatteryModule } from './modules/BatteryModule'
-
-// 新增模块
-export { FeatureDetectionModule } from './modules/FeatureDetectionModule'
-export type { FeatureDetectionEvents, FeatureDetectionInfo } from './modules/FeatureDetectionModule'
-
-export { GeolocationModule } from './modules/GeolocationModule'
-
-export { MediaModule } from './modules/MediaModule'
-
-export type { MediaDeviceInfo, MediaDeviceItem, MediaModuleEvents } from './modules/MediaModule'
-// 扩展模块
-export { NetworkModule } from './modules/NetworkModule'
-
-export { PerformanceModule } from './modules/PerformanceModule'
-export type { DevicePerformanceInfo, PerformanceModuleEvents, PerformanceTestOptions } from './modules/PerformanceModule'
-
-// 新增模块
-export { MediaCapabilitiesModule } from './modules/MediaCapabilitiesModule'
-export type { MediaCapabilityInfo, MediaConfig, MediaCapabilitiesEvents, HDRSupport } from './modules/MediaCapabilitiesModule'
-
-export { WakeLockModule } from './modules/WakeLockModule'
-export type { WakeLockEvents } from './modules/WakeLockModule'
-
-export { VibrationModule } from './modules/VibrationModule'
-export type { VibrationEvents, VibrationPatternName } from './modules/VibrationModule'
-
-export { ClipboardModule } from './modules/ClipboardModule'
-export type { ClipboardEvents } from './modules/ClipboardModule'
-
-export { OrientationLockModule } from './modules/OrientationLockModule'
-export type { OrientationLockEvents } from './modules/OrientationLockModule'
-
-// 类型定义
-export type {
-  BatteryInfo,
-  DeviceDetectorEvents,
-  DeviceDetectorOptions,
-  DeviceInfo,
-  DeviceModule,
-  DeviceType,
-  EventListener,
-  GeolocationInfo,
-  ModuleLoader as IModuleLoader,
-  NetworkInfo,
-  NetworkStatus,
-  NetworkType,
-  Orientation,
-} from './types'
-
-// 工具函数
-export {
-  debounce,
-  formatBytes,
-  generateId,
-  getDeviceTypeByWidth,
-  getPixelRatio,
-  getScreenOrientation,
-  isAPISupported,
-  isMobileDevice,
-  isTouchDevice,
-  parseBrowser,
-  parseOS,
-  safeNavigatorAccess,
-  throttle,
-} from './utils'
-
-// Vue集成
+// 导出原有的完整功能
+export * from './core'
+export * from './modules'
+export * from './types'
+export * from './utils'
 export * from './vue'
+
+// 版本信息
+export const VERSION = '0.2.0'
+
+// 模块化迁移提示
+console.info(`
+🎉 @ldesign/device v${VERSION}
+
+📦 现已支持模块化架构！
+
+推荐使用新的子包：
+- @ldesign/device-core      核心功能
+- @ldesign/device-battery    电池检测
+- @ldesign/device-network    网络检测  
+- @ldesign/device-vue        Vue 3 适配
+- @ldesign/device-react      React 18+ 适配
+- @ldesign/device-solid      Solid.js 适配
+
+详见: packages/ 目录
+`)

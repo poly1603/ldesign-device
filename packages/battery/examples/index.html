@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ldesign/device-battery - 电池检测演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .battery-display {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .battery-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .battery-level {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #10b981;
+      margin-bottom: 0.5rem;
+    }
+
+    .battery-level.low {
+      color: #ef4444;
+    }
+
+    .battery-level.medium {
+      color: #f59e0b;
+    }
+
+    .battery-status {
+      font-size: 1.5rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+    }
+
+    .charging-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .charging-badge.charging {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .charging-badge.discharging {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .info-item {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .info-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .log {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem;
+      max-height: 250px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔋 @ldesign/device-battery</h1>
+      <p>实时电池检测演示</p>
+    </div>
+
+    <div id="unsupported-alert" class="alert alert-warning" style="display: none;">
+      <span style="font-size: 1.5rem;">⚠️</span>
+      <div>
+        <strong>不支持 Battery API</strong><br>
+        <small>您的浏览器不支持电池检测功能</small>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="battery-display">
+        <div class="battery-icon" id="battery-icon">🔋</div>
+        <div class="battery-level" id="battery-level">--</div>
+        <div class="battery-status" id="battery-status">--</div>
+        <div class="charging-badge charging" id="charging-badge">
+          检测中...
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">⏱️ 充电时间</div>
+          <div class="info-value" id="charging-time">--</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">⏳ 放电时间</div>
+          <div class="info-value" id="discharging-time">--</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📊 事件日志</h2>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

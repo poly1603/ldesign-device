@@ -1,0 +1,74 @@
+{
+  "name": "@ldesign/device-core",
+  "version": "0.1.0",
+  "description": "Framework-agnostic core device detection library with event system, types, and utilities",
+  "keywords": [
+    "device",
+    "detection",
+    "framework-agnostic",
+    "event-emitter",
+    "typescript",
+    "responsive"
+  ],
+  "author": "ldesign",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./es/index.d.ts",
+      "import": "./es/index.js",
+      "require": "./lib/index.cjs"
+    },
+    "./events": {
+      "types": "./es/EventEmitter.d.ts",
+      "import": "./es/EventEmitter.js",
+      "require": "./lib/EventEmitter.cjs"
+    },
+    "./types": {
+      "types": "./es/types.d.ts",
+      "import": "./es/types.js",
+      "require": "./lib/types.cjs"
+    },
+    "./types/*": {
+      "types": "./es/types/*.d.ts",
+      "import": "./es/types/*.js",
+      "require": "./lib/types/*.cjs"
+    }
+  },
+  "main": "./lib/index.cjs",
+  "module": "./es/index.js",
+  "types": "./es/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "es",
+    "lib",
+    "dist"
+  ],
+  "scripts": {
+    "build": "ldesign-builder build -f esm,cjs,umd,dts",
+    "build:watch": "ldesign-builder build -f esm,cjs,umd,dts --watch",
+    "dev": "ldesign-builder build -f esm,cjs,dts --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf es lib dist"
+  },
+  "devDependencies": {
+    "@ldesign/builder": "workspace:../../../../../../tools/builder",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.18.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

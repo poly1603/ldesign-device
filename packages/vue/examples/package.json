@@ -1,0 +1,21 @@
+{
+  "name": "@ldesign/device-vue-example",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ldesign-launcher dev",
+    "build": "ldesign-launcher build",
+    "preview": "ldesign-launcher preview"
+  },
+  "dependencies": {
+    "@ldesign/device-vue": "workspace:*",
+    "vue": "^3.5.18"
+  },
+  "devDependencies": {
+    "@ldesign/launcher": "workspace:../../../../../../../tools/launcher",
+    "@vitejs/plugin-vue": "^5.0.3",
+    "typescript": "^5.7.3"
+  }
+}
+
