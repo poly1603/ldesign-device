@@ -47,8 +47,8 @@
     "@ldesign/device-core": "workspace:*"
   },
   "devDependencies": {
-    "@ldesign/builder": "workspace:../../../../../../tools/builder",
-    "@ldesign/launcher": "workspace:../../../../../../tools/launcher",
+    "@ldesign/builder": "workspace:*",
+    "@ldesign/launcher": "workspace:*",
     "@types/node": "^22.0.0",
     "eslint": "^9.18.0",
     "typescript": "^5.7.3",

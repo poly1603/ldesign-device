@@ -53,7 +53,7 @@
     "solid-js": "^1.7.0"
   },
   "devDependencies": {
-    "@ldesign/builder": "workspace:../../../../../../tools/builder",
+    "@ldesign/builder": "workspace:*",
     "@types/node": "^22.0.0",
     "eslint": "^9.18.0",
     "typescript": "^5.7.3",

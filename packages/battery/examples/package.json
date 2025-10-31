@@ -12,7 +12,7 @@
     "@ldesign/device-battery": "workspace:*"
   },
   "devDependencies": {
-    "@ldesign/launcher": "workspace:../../../../../../../tools/launcher",
+    "@ldesign/launcher": "workspace:*",
     "typescript": "^5.7.3"
   }
 }

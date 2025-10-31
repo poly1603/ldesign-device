@@ -72,7 +72,7 @@
     }
   },
   "devDependencies": {
-    "@ldesign/builder": "workspace:../../../../../../tools/builder",
+    "@ldesign/builder": "workspace:*",
     "@types/node": "^22.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

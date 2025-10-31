@@ -13,7 +13,7 @@
     "vue": "^3.5.18"
   },
   "devDependencies": {
-    "@ldesign/launcher": "workspace:../../../../../../../tools/launcher",
+    "@ldesign/launcher": "workspace:*",
     "@vitejs/plugin-vue": "^5.0.3",
     "typescript": "^5.7.3"
   }
