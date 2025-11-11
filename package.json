@@ -1,7 +1,6 @@
 {
   "name": "@ldesign/device",
   "version": "0.2.0",
-  "private": true,
   "description": "Modern device detection library with modular architecture - Monorepo",
   "keywords": [
     "device",
@@ -18,6 +17,94 @@
   "author": "ldesign",
   "license": "MIT",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./es/index.d.ts",
+      "import": "./es/index.js",
+      "require": "./lib/index.cjs"
+    },
+    "./core": {
+      "types": "./es/core/index.d.ts",
+      "import": "./es/core/index.js",
+      "require": "./lib/core/index.cjs"
+    },
+    "./core/*": {
+      "types": "./es/core/*.d.ts",
+      "import": "./es/core/*.js",
+      "require": "./lib/core/*.cjs"
+    },
+    "./engine": {
+      "types": "./es/engine/index.d.ts",
+      "import": "./es/engine/index.js",
+      "require": "./lib/engine/index.cjs"
+    },
+    "./engine/*": {
+      "types": "./es/engine/*.d.ts",
+      "import": "./es/engine/*.js",
+      "require": "./lib/engine/*.cjs"
+    },
+    "./modules": {
+      "types": "./es/modules/index.d.ts",
+      "import": "./es/modules/index.js",
+      "require": "./lib/modules/index.cjs"
+    },
+    "./modules/*": {
+      "types": "./es/modules/*.d.ts",
+      "import": "./es/modules/*.js",
+      "require": "./lib/modules/*.cjs"
+    },
+    "./types": {
+      "types": "./es/types/index.d.ts",
+      "import": "./es/types/index.js",
+      "require": "./lib/types/index.cjs"
+    },
+    "./types/*": {
+      "types": "./es/types/*.d.ts",
+      "import": "./es/types/*.js",
+      "require": "./lib/types/*.cjs"
+    },
+    "./utils": {
+      "types": "./es/utils/index.d.ts",
+      "import": "./es/utils/index.js",
+      "require": "./lib/utils/index.cjs"
+    },
+    "./utils/*": {
+      "types": "./es/utils/*.d.ts",
+      "import": "./es/utils/*.js",
+      "require": "./lib/utils/*.cjs"
+    },
+    "./vue": {
+      "types": "./es/vue/index.d.ts",
+      "import": "./es/vue/index.js",
+      "require": "./lib/vue/index.cjs"
+    },
+    "./vue/*": {
+      "types": "./es/vue/*.d.ts",
+      "import": "./es/vue/*.js",
+      "require": "./lib/vue/*.cjs"
+    },
+    "./es/index.css": "./es/index.css",
+    "./es/vue/components/DeviceInfo.vue.css": "./es/vue/components/DeviceInfo.vue.css",
+    "./es/vue/components/NetworkStatus.vue.css": "./es/vue/components/NetworkStatus.vue.css",
+    "./lib/index.css": "./lib/index.css",
+    "./lib/vue/components/DeviceInfo.vue.css": "./lib/vue/components/DeviceInfo.vue.css",
+    "./lib/vue/components/NetworkStatus.vue.css": "./lib/vue/components/NetworkStatus.vue.css",
+    "./dist/index.css": "./dist/index.css",
+    "./dist/index.min.css": "./dist/index.min.css"
+  },
+  "main": "./lib/index.cjs",
+  "module": "./es/index.js",
+  "types": "./es/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "es",
+    "lib",
+    "dist"
+  ],
   "scripts": {
     "build": "ldesign-builder build -f esm,cjs,dts",
     "build:all": "pnpm -r --filter './packages/**' build",
@@ -53,5 +140,6 @@
   "engines": {
     "node": ">=18",
     "pnpm": ">=8"
-  }
+  },
+  "private": true
 }
