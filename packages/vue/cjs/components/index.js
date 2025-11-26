@@ -2,7 +2,7 @@
  * ***********************************
  * @ldesign/device-vue v1.0.0      *
  * Built with rollup               *
- * Build time: 2024-11-26 14:52:34 *
+ * Build time: 2024-11-26 15:37:00 *
  * Build mode: production          *
  * Minified: No                    *
  * ***********************************

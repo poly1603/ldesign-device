@@ -439,6 +439,56 @@ export function getDeviceTypeByWidth(
 }
 
 /**
+ * 获取设备屏幕尺寸
+ * @returns 设备屏幕的宽度和高度,如果无法获取则返回 { width: 0, height: 0 }
+ */
+export function getScreenSize(): { width: number, height: number } {
+  if (typeof window === 'undefined' || !window.screen) {
+    return { width: 0, height: 0 }
+  }
+
+  return {
+    width: window.screen.width || 0,
+    height: window.screen.height || 0,
+  }
+}
+
+/**
+ * 根据屏幕尺寸判断设备类型
+ *
+ * 这是优先级最高的检测方法,基于设备的物理屏幕尺寸进行判断。
+ * 相比基于窗口宽度的检测,这种方法更准确地反映设备的实际类型。
+ *
+ * @param screenWidth - 设备屏幕宽度 (screen.width)
+ * @param breakpoints - 断点配置
+ * @returns 设备类型,如果屏幕宽度无效则返回 null
+ *
+ * @example
+ * ```typescript
+ * const screenSize = getScreenSize()
+ * const deviceType = getDeviceTypeByScreenSize(screenSize.width)
+ * // 返回: 'mobile' | 'tablet' | 'desktop' | null
+ * ```
+ */
+export function getDeviceTypeByScreenSize(
+  screenWidth: number,
+  breakpoints = { mobile: 768, tablet: 1024 },
+): DeviceType | null {
+  // 屏幕尺寸无效时返回 null,降级到其他检测方法
+  if (!screenWidth || screenWidth === 0) {
+    return null
+  }
+
+  if (screenWidth < breakpoints.mobile) {
+    return 'mobile'
+  }
+  if (screenWidth < breakpoints.tablet) {
+    return 'tablet'
+  }
+  return 'desktop'
+}
+
+/**
  * 获取屏幕方向
  * @param width - 可选的屏幕宽度，如果不提供则使用当前窗口宽度
  * @param height - 可选的屏幕高度，如果不提供则使用当前窗口高度

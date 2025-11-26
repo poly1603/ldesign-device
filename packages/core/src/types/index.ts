@@ -39,6 +39,11 @@ export type NetworkConnectionType =
 export type NetworkStatus = 'online' | 'offline'
 
 /**
+ * 设备检测方法类型
+ */
+export type DetectionMethod = 'screen' | 'viewport' | 'userAgent'
+
+/**
  * 设备检测器配置选项
  */
 export interface DeviceDetectorOptions {
@@ -57,6 +62,15 @@ export interface DeviceDetectorOptions {
   modules?: string[]
   /** 是否启用调试模式（性能预算警告等） */
   debug?: boolean
+  /** 是否启用动态设备类型检测（默认 true） */
+  enableDynamicType?: boolean
+  /** 是否优先使用屏幕尺寸进行检测（默认 true） */
+  useScreenSize?: boolean
+  /** 屏幕尺寸断点配置（用于基于物理屏幕尺寸的检测） */
+  screenSizeBreakpoints?: {
+    mobile: number
+    tablet: number
+  }
 }
 
 /**
@@ -67,10 +81,14 @@ export interface DeviceInfo {
   type: DeviceType
   /** 屏幕方向 */
   orientation: Orientation
-  /** 屏幕宽度 */
+  /** 视口宽度 (window.innerWidth) */
   width: number
-  /** 屏幕高度 */
+  /** 视口高度 (window.innerHeight) */
   height: number
+  /** 设备屏幕宽度 (screen.width) */
+  screenWidth: number
+  /** 设备屏幕高度 (screen.height) */
+  screenHeight: number
   /** 设备像素比 */
   pixelRatio: number
   /** 是否为触摸设备 */
@@ -91,11 +109,20 @@ export interface DeviceInfo {
   }
   /** 屏幕信息 */
   screen: {
+    /** 视口宽度 */
     width: number
+    /** 视口高度 */
     height: number
+    /** 设备像素比 */
     pixelRatio: number
+    /** 可用宽度 */
     availWidth: number
+    /** 可用高度 */
     availHeight: number
+    /** 设备物理屏幕宽度 */
+    deviceWidth: number
+    /** 设备物理屏幕高度 */
+    deviceHeight: number
   }
   /** 设备特性 */
   features: {
@@ -104,6 +131,15 @@ export interface DeviceInfo {
     camera?: boolean
     microphone?: boolean
     bluetooth?: boolean
+  }
+  /** 检测元数据 */
+  detection: {
+    /** 检测方法 */
+    method: DetectionMethod
+    /** 检测优先级 (3=screen, 2=viewport, 1=userAgent) */
+    priority: number
+    /** 是否为动态检测 */
+    isDynamic: boolean
   }
 }
 

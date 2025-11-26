@@ -1,5 +1,6 @@
 import type {
   BatteryInfo,
+  DetectionMethod,
   DeviceDetectorEvents,
   DeviceDetectorOptions,
   DeviceInfo,
@@ -11,9 +12,12 @@ import type {
 } from '../types'
 import {
   debounce,
+  getDeviceTypeByScreenSize,
   getDeviceTypeByWidth,
   getPixelRatio,
   getScreenOrientation,
+  getScreenSize,
+  isMobileDevice,
   isTouchDevice,
   parseBrowser,
   parseOS,
@@ -139,6 +143,12 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
         tablet: 1024,
       },
       debounceDelay: 100,
+      enableDynamicType: true,
+      useScreenSize: true,
+      screenSizeBreakpoints: {
+        mobile: 768,
+        tablet: 1024,
+      },
       ...options,
     }
 
@@ -478,6 +488,65 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
   }
 
   /**
+   * 检测设备类型(支持多级检测优先级)
+   */
+  private detectDeviceType(): {
+    type: DeviceType
+    method: DetectionMethod
+    priority: number
+    isDynamic: boolean
+  } {
+    const screenSize = getScreenSize()
+    const viewportWidth = window.innerWidth
+    const breakpoints = this.options.breakpoints || { mobile: 768, tablet: 1024 }
+    const screenBreakpoints = this.options.screenSizeBreakpoints || breakpoints
+
+    // 优先级 1: 屏幕尺寸 (最准确,基于设备物理尺寸)
+    if (this.options.useScreenSize !== false && screenSize.width > 0) {
+      const screenType = getDeviceTypeByScreenSize(screenSize.width, screenBreakpoints)
+      if (screenType) {
+        return {
+          type: screenType,
+          method: 'screen',
+          priority: 3,
+          isDynamic: false, // 屏幕尺寸通常不变
+        }
+      }
+    }
+
+    // 优先级 2: 视口宽度 (动态,适合响应式设计)
+    const viewportType = getDeviceTypeByWidth(viewportWidth, breakpoints)
+
+    // 对于桌面设备,如果启用了动态检测,使用视口宽度
+    // 这允许桌面浏览器窗口缩小时动态改变设备类型
+    if (this.options.enableDynamicType !== false) {
+      return {
+        type: viewportType,
+        method: 'viewport',
+        priority: 2,
+        isDynamic: true, // 视口宽度会变化
+      }
+    }
+
+    // 优先级 3: UserAgent (降级方案)
+    if (isMobileDevice()) {
+      return {
+        type: 'mobile',
+        method: 'userAgent',
+        priority: 1,
+        isDynamic: false,
+      }
+    }
+
+    return {
+      type: 'desktop',
+      method: 'userAgent',
+      priority: 1,
+      isDynamic: false,
+    }
+  }
+
+  /**
    * 检测设备信息
    */
   private detectDevice(): DeviceInfo {
@@ -488,6 +557,8 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
         orientation: 'landscape',
         width: 1920,
         height: 1080,
+        screenWidth: 1920,
+        screenHeight: 1080,
         pixelRatio: 1,
         isTouchDevice: false,
         userAgent: '',
@@ -499,9 +570,16 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
           pixelRatio: 1,
           availWidth: 1920,
           availHeight: 1080,
+          deviceWidth: 1920,
+          deviceHeight: 1080,
         },
         features: {
           touch: false,
+        },
+        detection: {
+          method: 'userAgent',
+          priority: 1,
+          isDynamic: false,
         },
       }
     }
@@ -525,6 +603,9 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
       const height = window.innerHeight
       const userAgent = navigator.userAgent
 
+      // 获取设备屏幕尺寸
+      const screenSize = getScreenSize()
+
       // 性能优化：缓存用户代理解析结果,带过期时间
       let os = this.cachedOS
       let browser = this.cachedBrowser
@@ -541,11 +622,16 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
       const pixelRatio = getPixelRatio()
       const touchDevice = isTouchDevice()
 
+      // 使用新的多级检测逻辑
+      const deviceTypeDetection = this.detectDeviceType()
+
       const deviceInfo: DeviceInfo = {
-        type: getDeviceTypeByWidth(width, this.options.breakpoints),
+        type: deviceTypeDetection.type,
         orientation: getScreenOrientation(),
         width,
         height,
+        screenWidth: screenSize.width,
+        screenHeight: screenSize.height,
         pixelRatio,
         isTouchDevice: touchDevice,
         userAgent,
@@ -557,10 +643,17 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
           pixelRatio,
           availWidth: window.screen?.availWidth || width,
           availHeight: window.screen?.availHeight || height,
+          deviceWidth: screenSize.width,
+          deviceHeight: screenSize.height,
         },
         features: {
           touch: touchDevice,
           webgl: typeof window !== 'undefined' ? this.detectWebGL() : false,
+        },
+        detection: {
+          method: deviceTypeDetection.method,
+          priority: deviceTypeDetection.priority,
+          isDynamic: deviceTypeDetection.isDynamic,
         },
       }
 

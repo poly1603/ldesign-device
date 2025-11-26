@@ -32,7 +32,11 @@ _🌟 轻量、高效、类型安全的设备检测解决方案，完美支持 V
 ### 🎯 **智能检测，精准无误**
 ```typescript
 // 🔥 一行代码，搞定设备检测
-const { isMobile, isTablet, orientation } = useDevice()
+const { isMobile, isTablet, orientation, deviceInfo } = useDevice()
+
+// 📱 获取设备屏幕分辨率（新功能！）
+console.log(`设备分辨率: ${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`)
+console.log(`视口尺寸: ${deviceInfo.width}x${deviceInfo.height}`)
 
 // 🎨 响应式设计从未如此简单
 if (isMobile.value) {
@@ -41,6 +45,47 @@ if (isMobile.value) {
 else if (isTablet.value) {
   // 平板优化界面
 }
+```
+
+### 🆕 **多级检测优先级 - 更准确的设备识别**
+```typescript
+// 全新的三级检测优先级系统
+const detector = new DeviceDetector({
+  useScreenSize: true,        // 优先使用物理屏幕尺寸（默认启用）
+  enableDynamicType: true,    // 启用动态类型检测（默认启用）
+})
+
+const device = detector.getDeviceInfo()
+
+// 📊 检测元数据 - 了解检测方式
+console.log(device.detection)
+// {
+//   method: 'screen',      // 检测方法: 'screen' | 'viewport' | 'userAgent'
+//   priority: 3,           // 优先级: 3=最高(屏幕), 2=中(视口), 1=低(UA)
+//   isDynamic: false       // 是否动态检测
+// }
+```
+
+**检测优先级说明：**
+1. 🥇 **屏幕尺寸检测 (优先级3)** - 基于设备物理屏幕尺寸，最准确
+2. 🥈 **视口宽度检测 (优先级2)** - 基于浏览器窗口大小，支持动态变化
+3. 🥉 **UserAgent 检测 (优先级1)** - 降级方案，兼容性最好
+
+### 🔄 **动态设备类型 - 桌面浏览器响应式支持**
+```typescript
+// 桌面浏览器窗口缩小时，设备类型会动态变化
+const detector = new DeviceDetector({
+  enableDynamicType: true  // 默认开启
+})
+
+// 监听设备类型变化
+detector.on('deviceChange', (info) => {
+  console.log(`设备类型变为: ${info.type}`)
+  console.log(`检测方式: ${info.detection.method}`)
+  
+  // 桌面浏览器窗口从 1920px 缩小到 600px
+  // 设备类型会从 'desktop' 变为 'mobile'
+})
 ```
 
 ### ⚡ **性能卓越，轻如羽毛**
