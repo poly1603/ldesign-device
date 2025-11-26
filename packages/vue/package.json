@@ -1,12 +1,19 @@
 {
   "name": "@ldesign/device-vue",
-  "version": "0.1.0",
-  "description": "Vue3 adapter for device detection library",
+  "version": "1.0.0",
+  "description": "Vue 3 integration for @ldesign/device - Composables, components, directives and plugins for device detection",
   "keywords": [
     "vue3",
+    "vue",
     "device",
     "detection",
+    "responsive",
     "composables",
+    "components",
+    "directives",
+    "battery",
+    "network",
+    "geolocation",
     "typescript"
   ],
   "author": "ldesign",
@@ -15,63 +22,86 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./es/index.d.ts",
-      "import": "./es/index.js",
-      "require": "./lib/index.cjs"
-    },
-    "./composables": {
-      "types": "./es/composables/index.d.ts",
-      "import": "./es/composables/index.js",
-      "require": "./lib/composables/index.cjs"
-    },
-    "./composables/*": {
-      "types": "./es/composables/*.d.ts",
-      "import": "./es/composables/*.js",
-      "require": "./lib/composables/*.cjs"
+      "types": "./esm/index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./cjs/index.cjs"
     },
     "./components": {
-      "types": "./es/components/index.d.ts",
-      "import": "./es/components/index.js",
-      "require": "./lib/components/index.cjs"
+      "types": "./esm/components/index.d.ts",
+      "import": "./esm/components/index.js",
+      "require": "./cjs/components/index.cjs"
+    },
+    "./components/*": {
+      "types": "./esm/components/*.d.ts",
+      "import": "./esm/components/*.js",
+      "require": "./cjs/components/*.cjs"
+    },
+    "./composables": {
+      "types": "./esm/composables/index.d.ts",
+      "import": "./esm/composables/index.js",
+      "require": "./cjs/composables/index.cjs"
+    },
+    "./composables/*": {
+      "types": "./esm/composables/*.d.ts",
+      "import": "./esm/composables/*.js",
+      "require": "./cjs/composables/*.cjs"
     },
     "./directives": {
-      "types": "./es/directives/index.d.ts",
-      "import": "./es/directives/index.js",
-      "require": "./lib/directives/index.cjs"
-    }
+      "types": "./esm/directives/index.d.ts",
+      "import": "./esm/directives/index.js",
+      "require": "./cjs/directives/index.cjs"
+    },
+    "./directives/*": {
+      "types": "./esm/directives/*.d.ts",
+      "import": "./esm/directives/*.js",
+      "require": "./cjs/directives/*.cjs"
+    },
+    "./plugins": {
+      "types": "./esm/plugins/index.d.ts",
+      "import": "./esm/plugins/index.js",
+      "require": "./cjs/plugins/index.cjs"
+    },
+    "./plugins/*": {
+      "types": "./esm/plugins/*.d.ts",
+      "import": "./esm/plugins/*.js",
+      "require": "./cjs/plugins/*.cjs"
+    },
+    "./cjs/components/DeviceInfo.vue.css": "./cjs/components/DeviceInfo.vue.css",
+    "./cjs/components/NetworkStatus.vue.css": "./cjs/components/NetworkStatus.vue.css",
+    "./cjs/index.css": "./cjs/index.css"
   },
-  "main": "./lib/index.cjs",
-  "module": "./es/index.js",
-  "types": "./es/index.d.ts",
+  "main": "./cjs/index.cjs",
+  "module": "./esm/index.js",
+  "types": "./esm/index.d.ts",
+  "unpkg": "./dist/index.min.js",
+  "jsdelivr": "./dist/index.min.js",
   "files": [
     "README.md",
     "LICENSE",
     "package.json",
-    "es",
-    "lib",
-    "dist"
+    "esm",
+    "cjs"
   ],
   "scripts": {
-    "build": "ldesign-builder build -f esm,cjs,dts",
-    "dev": "ldesign-builder build -f esm,cjs,dts --watch",
+    "build": "ldesign-builder build -f esm,cjs",
+    "build:watch": "ldesign-builder build -f esm,cjs --watch",
+    "dev": "ldesign-builder build -f esm,cjs --watch",
     "test": "vitest",
     "test:run": "vitest run",
-    "lint": "eslint . --fix",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "type-check": "vue-tsc --noEmit",
-    "clean": "rimraf es lib dist"
+    "type-check:watch": "vue-tsc --noEmit --watch",
+    "clean": "rimraf es esm cjs dist coverage .tsbuildinfo"
   },
   "dependencies": {
     "@ldesign/device-core": "workspace:*",
-    "@ldesign/device-battery": "workspace:*",
-    "@ldesign/device-network": "workspace:*"
+    "@ldesign/shared": "workspace:*",
+    "tslib": "^2.6.2"
   },
   "peerDependencies": {
     "vue": "^3.3.0"
-  },
-  "peerDependenciesMeta": {
-    "vue": {
-      "optional": false
-    }
   },
   "devDependencies": {
     "@ldesign/builder": "workspace:*",
@@ -85,6 +115,10 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": false
+    }
   }
 }
-

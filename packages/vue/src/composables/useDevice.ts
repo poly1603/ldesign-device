@@ -1,106 +1,300 @@
-import { ref, readonly, onMounted, onUnmounted } from 'vue'
 import type { Ref } from 'vue'
-import type { DeviceInfo, DeviceType, Orientation } from '@ldesign/device-core'
+import type {
+  DeviceInfo,
+  DeviceType,
+  Orientation,
+  DeviceDetector,
+} from '@ldesign/device-core'
+import { computed, onMounted, onUnmounted, readonly, ref } from 'vue'
+import { DeviceDetector as CoreDeviceDetector } from '@ldesign/device-core'
 
 /**
- * 设备检测 Composable
- * 
+ * 设备检测器配置选项
+ */
+export interface DeviceDetectorOptions {
+  enableResize?: boolean
+  enableOrientation?: boolean
+  modules?: string[]
+}
+
+/**
+ * useDevice 返回值类型
+ */
+export interface UseDeviceReturn {
+  deviceInfo: Readonly<Ref<DeviceInfo | undefined>>
+  deviceType: Readonly<Ref<DeviceType>>
+  orientation: Readonly<Ref<Orientation>>
+  isMobile: Readonly<Ref<boolean>>
+  isTablet: Readonly<Ref<boolean>>
+  isDesktop: Readonly<Ref<boolean>>
+  isTouchDevice: Readonly<Ref<boolean>>
+  refresh: () => void
+}
+
+/**
+ * Vue3 设备检�?Composition API - 优化版本
+ *
+ * 提供响应式的设备信息检测功能，包括设备类型、屏幕方向、触摸支持等
+ *
+ * @param options 设备检测器配置选项
+ * @returns 设备信息相关的响应式数据和方�?
+ *
  * @example
  * ```vue
  * <script setup>
- * import { useDevice } from '@ldesign/device-vue'
- * 
- * const { deviceType, isMobile, isTablet, isDesktop } = useDevice()
+ * import { useDevice } from '@ldesign/device/vue'
+ *
+ * const {
+ *   deviceType,
+ *   orientation,
+ *   deviceInfo,
+ *   isMobile,
+ *   isTablet,
+ *   isDesktop,
+ *   isTouchDevice,
+ *   refresh
+ * } = useDevice({
+ *   enableResize: true,
+ *   enableOrientation: true
+ * })
  * </script>
+ *
+ * <template>
+ *   <div>
+ *     <p>设备类型: {{ deviceType }}</p>
+ *     <p>屏幕方向: {{ orientation }}</p>
+ *     <p>是否移动设备: {{ isMobile }}</p>
+ *     <p>是否支持触摸: {{ isTouchDevice }}</p>
+ *     <button @click="refresh">刷新设备信息</button>
+ *   </div>
+ * </template>
  * ```
  */
-export function useDevice() {
-  const deviceInfo = ref<DeviceInfo>({
-    type: 'desktop',
-    orientation: 'landscape',
-    width: 0,
-    height: 0,
-    pixelRatio: 1,
-    isTouchDevice: false,
-    userAgent: '',
-    os: { name: 'unknown', version: 'unknown' },
-    browser: { name: 'unknown', version: 'unknown' },
-  }) as Ref<DeviceInfo>
-
+export function useDevice(
+  options: DeviceDetectorOptions = {},
+): UseDeviceReturn {
+  // 响应式状态 - 使用 ref
+  const deviceInfo = ref<DeviceInfo | undefined>(undefined)
   const deviceType = ref<DeviceType>('desktop')
   const orientation = ref<Orientation>('landscape')
-  const isMobile = ref(false)
-  const isTablet = ref(false)
-  const isDesktop = ref(true)
-  const isTouchDevice = ref(false)
 
-  function detectDevice() {
-    if (typeof window === 'undefined') return
+  // 设备检测器实例
+  let detector: DeviceDetector | null = null
+  let isInitialized = false
+  let cleanupFunctions: Array<() => void> = []
 
-    const width = window.innerWidth
-    const height = window.innerHeight
+  // 计算属�?- 使用 readonly 包装以防止外部修�?
+  const isMobile = readonly(computed(() => deviceType.value === 'mobile'))
+  const isTablet = readonly(computed(() => deviceType.value === 'tablet'))
+  const isDesktop = readonly(computed(() => deviceType.value === 'desktop'))
+  const isTouchDevice = readonly(computed(() => deviceInfo.value?.features?.touch ?? false))
 
-    // 简单的设备类型检测
-    if (width < 768) {
-      deviceType.value = 'mobile'
-      isMobile.value = true
-      isTablet.value = false
-      isDesktop.value = false
+  /**
+   * 更新设备信息 - 优化版本，减少不必要的更�?
+   */
+  const updateDeviceInfo = (info: DeviceInfo) => {
+    // 批量更新以减少响应式触发次数
+    if (deviceInfo.value?.type !== info.type) {
+      deviceType.value = info.type
     }
-    else if (width < 1024) {
-      deviceType.value = 'tablet'
-      isMobile.value = false
-      isTablet.value = true
-      isDesktop.value = false
+    if (deviceInfo.value?.orientation !== info.orientation) {
+      orientation.value = info.orientation
     }
-    else {
-      deviceType.value = 'desktop'
-      isMobile.value = false
-      isTablet.value = false
-      isDesktop.value = true
-    }
+    deviceInfo.value = info
+  }
 
-    orientation.value = width > height ? 'landscape' : 'portrait'
-    isTouchDevice.value = 'ontouchstart' in window
-
-    deviceInfo.value = {
-      type: deviceType.value,
-      orientation: orientation.value,
-      width,
-      height,
-      pixelRatio: window.devicePixelRatio || 1,
-      isTouchDevice: isTouchDevice.value,
-      userAgent: navigator.userAgent,
-      os: { name: 'unknown', version: 'unknown' },
-      browser: { name: 'unknown', version: 'unknown' },
+  /**
+   * 刷新设备信息
+   */
+  const refresh = () => {
+    if (detector && isInitialized) {
+      const currentInfo = detector.getDeviceInfo()
+      updateDeviceInfo(currentInfo)
     }
   }
 
-  let resizeObserver: (() => void) | null = null
+  /**
+   * 初始化设备检测器 - 优化版本
+   */
+  const initDetector = () => {
+    if (detector || isInitialized) {
+      return
+    }
 
+    try {
+      detector = new CoreDeviceDetector(options)
+      isInitialized = true
+
+      // 获取初始设备信息
+      updateDeviceInfo(detector.getDeviceInfo())
+
+      // 监听设备变化 - 使用更精确的事件处理
+      const deviceChangeHandler = (info: DeviceInfo) => {
+        updateDeviceInfo(info)
+      }
+
+      const orientationChangeHandler = (newOrientation: Orientation) => {
+        if (orientation.value !== newOrientation) {
+          orientation.value = newOrientation
+        }
+      }
+
+      detector.on('deviceChange', deviceChangeHandler)
+      detector.on('orientationChange', orientationChangeHandler)
+
+      // 保存清理函数
+      cleanupFunctions.push(
+        () => detector?.off('deviceChange', deviceChangeHandler),
+        () => detector?.off('orientationChange', orientationChangeHandler),
+      )
+    }
+    catch (error) {
+      console.error('Failed to initialize device detector:', error)
+      isInitialized = false
+    }
+  }
+
+  /**
+   * 销毁设备检测器 - 优化版本
+   */
+  const destroyDetector = async () => {
+    try {
+      // 清理事件监听�?
+      cleanupFunctions.forEach(cleanup => cleanup())
+      cleanupFunctions = []
+
+      // 销毁检测器
+      if (detector) {
+        await detector.destroy()
+        detector = null
+      }
+
+      isInitialized = false
+    }
+    catch (error) {
+      console.error('Failed to destroy device detector:', error)
+    }
+  }
+
+  // 生命周期钩子
   onMounted(() => {
-    detectDevice()
-
-    const handler = () => detectDevice()
-    window.addEventListener('resize', handler)
-    resizeObserver = () => window.removeEventListener('resize', handler)
+    initDetector()
   })
 
   onUnmounted(() => {
-    if (resizeObserver) {
-      resizeObserver()
-    }
+    destroyDetector()
   })
 
   return {
-    deviceInfo: readonly(deviceInfo),
     deviceType: readonly(deviceType),
     orientation: readonly(orientation),
-    isMobile: readonly(isMobile),
-    isTablet: readonly(isTablet),
-    isDesktop: readonly(isDesktop),
-    isTouchDevice: readonly(isTouchDevice),
-    refresh: detectDevice,
+    deviceInfo: readonly(deviceInfo),
+    isMobile,
+    isTablet,
+    isDesktop,
+    isTouchDevice,
+    refresh,
   }
 }
 
+/**
+ * 网络状态检�?Composition API
+ *
+ * 提供网络连接状态、连接类型、网络速度等信息的响应式监�?
+ *
+ * @returns 网络状态相关的响应式数据和方法
+ *
+ * @example
+ * ```vue
+ * <script setup>
+ * import { useNetwork } from '@ldesign/device/vue'
+ *
+ * const {
+ *   networkInfo,
+ *   isOnline,
+ *   connectionType,
+ *   isLoaded,
+ *   loadModule,
+ *   unloadModule
+ * } = useNetwork()
+ *
+ * // 加载网络模块
+ * onMounted(() => {
+ *   loadModule()
+ * })
+ * </script>
+ *
+ * <template>
+ *   <div v-if="isLoaded">
+ *     <p>网络状�? {{ isOnline ? '在线' : '离线' }}</p>
+ *     <p>连接类型: {{ connectionType }}</p>
+ *     <p v-if="networkInfo">
+ *       下载速度: {{ networkInfo.downlink }}Mbps
+ *     </p>
+ *   </div>
+ * </template>
+ * ```
+ */
+export function useNetwork() {
+  const networkInfo = ref<NetworkInfo | null>(null)
+  const isOnline = ref(true)
+  const connectionType = ref<NetworkType>('unknown')
+  const isLoaded = ref(false)
+
+  let detector: DeviceDetector | null = null
+  let networkModule: NetworkModule | null = null
+
+  const loadModule = async () => {
+    if (!detector) {
+      detector = new CoreDeviceDetector()
+    }
+
+    try {
+      networkModule = await detector.loadModule<NetworkModule>('network')
+      if (networkModule && typeof networkModule.getData === 'function') {
+        networkInfo.value = networkModule.getData()
+        isOnline.value = networkInfo.value?.status === 'online'
+        connectionType.value = networkInfo.value?.type || 'unknown'
+        isLoaded.value = true
+      }
+    }
+    catch (error) {
+      console.warn('Failed to load network module:', error)
+      throw error
+    }
+  }
+
+  const unloadModule = async () => {
+    if (detector) {
+      await detector.unloadModule('network')
+      networkModule = null
+      networkInfo.value = null
+      isLoaded.value = false
+    }
+  }
+
+  const destroyNetwork = async () => {
+    if (detector) {
+      await detector.destroy()
+      detector = null
+      networkModule = null
+    }
+  }
+
+  onUnmounted(() => {
+    destroyNetwork()
+  })
+
+  return {
+    networkInfo: readonly(networkInfo),
+    isOnline: readonly(isOnline),
+    connectionType: readonly(connectionType),
+    isLoaded: readonly(isLoaded),
+    loadModule,
+    unloadModule,
+  }
+}
+
+// 为测试兼容性导出其他组合式 API（从此文件重导出�?
+export { useBattery } from './useBattery'
+export { useGeolocation } from './useGeolocation'

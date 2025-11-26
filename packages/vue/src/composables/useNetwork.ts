@@ -1,70 +1,50 @@
-import { ref, readonly, onMounted, onUnmounted } from 'vue'
-import type { Ref } from 'vue'
-import { NetworkModule } from '@ldesign/device-network'
-import type { NetworkInfo } from '@ldesign/device-core'
+import { ref, readonly, onUnmounted } from 'vue'
+import type { NetworkInfo, DeviceDetector } from '@ldesign/device-core'
+import { DeviceDetector as CoreDeviceDetector } from '@ldesign/device-core'
 
-/**
- * 网络检测 Composable
- * 
- * @example
- * ```vue
- * <script setup>
- * import { useNetwork } from '@ldesign/device-vue'
- * 
- * const { isOnline, connectionType } = useNetwork()
- * </script>
- * ```
- */
 export function useNetwork() {
-  const isOnline = ref(true)
-  const connectionType = ref('unknown')
-  const downlink = ref<number | undefined>(undefined)
-  const rtt = ref<number | undefined>(undefined)
-  const saveData = ref<boolean | undefined>(undefined)
   const networkInfo = ref<NetworkInfo | null>(null)
+  const isLoaded = ref(false)
+  let detector: DeviceDetector | null = null
 
-  let network: NetworkModule | null = null
-
-  async function init() {
-    network = new NetworkModule()
-    await network.init()
-
-    updateNetworkInfo()
-
-    network.on('networkChange', () => {
-      updateNetworkInfo()
-    })
+  async function loadModule() {
+    if (isLoaded.value) return
+    try {
+      detector = new CoreDeviceDetector({})
+      await detector.loadModule('network')
+      const module = detector.getModule('network')
+      if (module && typeof module.getData === 'function') {
+        networkInfo.value = module.getData()
+      }
+      detector.on('network:changed', () => {
+        const module = detector?.getModule('network')
+        if (module && typeof module.getData === 'function') {
+          networkInfo.value = module.getData()
+        }
+      })
+      isLoaded.value = true
+    } catch (error) {
+      console.error('Failed to load network module:', error)
+    }
   }
 
-  function updateNetworkInfo() {
-    if (!network) return
-
-    const info = network.getData()
-    networkInfo.value = info
-    isOnline.value = network.isOnline()
-    connectionType.value = network.getConnectionType()
-    downlink.value = network.getDownlink()
-    rtt.value = network.getRTT()
-    saveData.value = network.isSaveData()
+  function unloadModule() {
+    if (detector) {
+      detector.unloadModule('network')
+      detector = null
+    }
+    isLoaded.value = false
+    networkInfo.value = null
   }
-
-  onMounted(() => {
-    init()
-  })
 
   onUnmounted(() => {
-    if (network) {
-      network.destroy()
-    }
+    unloadModule()
   })
 
   return {
-    isOnline: readonly(isOnline),
-    connectionType: readonly(connectionType),
-    downlink: readonly(downlink),
-    rtt: readonly(rtt),
-    saveData: readonly(saveData),
     networkInfo: readonly(networkInfo),
+    isLoaded: readonly(isLoaded),
+    loadModule,
+    unloadModule,
   }
 }
-

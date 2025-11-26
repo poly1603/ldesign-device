@@ -1,14 +1,20 @@
 {
   "name": "@ldesign/device-core",
-  "version": "0.1.0",
-  "description": "Framework-agnostic core device detection library with event system, types, and utilities",
+  "version": "1.0.0",
+  "description": "Framework-agnostic device detection core library with advanced features including device type detection, orientation monitoring, browser/OS parsing, and modular extension system",
   "keywords": [
     "device",
     "detection",
+    "responsive",
+    "battery",
+    "network",
+    "geolocation",
+    "media",
     "framework-agnostic",
     "event-emitter",
     "typescript",
-    "responsive"
+    "core",
+    "modular"
   ],
   "author": "ldesign",
   "license": "MIT",
@@ -20,20 +26,45 @@
       "import": "./es/index.js",
       "require": "./lib/index.cjs"
     },
-    "./events": {
-      "types": "./es/EventEmitter.d.ts",
-      "import": "./es/EventEmitter.js",
-      "require": "./lib/EventEmitter.cjs"
+    "./core": {
+      "types": "./es/core/index.d.ts",
+      "import": "./es/core/index.js",
+      "require": "./lib/core/index.cjs"
+    },
+    "./core/*": {
+      "types": "./es/core/*.d.ts",
+      "import": "./es/core/*.js",
+      "require": "./lib/core/*.cjs"
+    },
+    "./modules": {
+      "types": "./es/modules/index.d.ts",
+      "import": "./es/modules/index.js",
+      "require": "./lib/modules/index.cjs"
+    },
+    "./modules/*": {
+      "types": "./es/modules/*.d.ts",
+      "import": "./es/modules/*.js",
+      "require": "./lib/modules/*.cjs"
     },
     "./types": {
-      "types": "./es/types.d.ts",
-      "import": "./es/types.js",
-      "require": "./lib/types.cjs"
+      "types": "./es/types/index.d.ts",
+      "import": "./es/types/index.js",
+      "require": "./lib/types/index.cjs"
     },
     "./types/*": {
       "types": "./es/types/*.d.ts",
       "import": "./es/types/*.js",
       "require": "./lib/types/*.cjs"
+    },
+    "./utils": {
+      "types": "./es/utils/index.d.ts",
+      "import": "./es/utils/index.js",
+      "require": "./lib/utils/index.cjs"
+    },
+    "./utils/*": {
+      "types": "./es/utils/*.d.ts",
+      "import": "./es/utils/*.js",
+      "require": "./lib/utils/*.cjs"
     }
   },
   "main": "./lib/index.cjs",
@@ -50,9 +81,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "ldesign-builder build -f esm,cjs,umd,dts",
-    "build:watch": "ldesign-builder build -f esm,cjs,umd,dts --watch",
-    "dev": "ldesign-builder build -f esm,cjs,dts --watch",
+    "build": "ldesign-builder build -f esm,cjs",
+    "build:watch": "ldesign-builder build -f esm,cjs --watch",
+    "dev": "ldesign-builder build -f esm,cjs --watch",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -61,11 +92,19 @@
     "type-check": "tsc --noEmit",
     "clean": "rimraf es lib dist"
   },
+  "dependencies": {
+    "@ldesign/shared": "workspace:*",
+    "tslib": "^2.6.2"
+  },
   "devDependencies": {
+    "@antfu/eslint-config": "^6.0.0",
     "@ldesign/builder": "workspace:*",
     "@types/node": "^22.0.0",
+    "@vitest/ui": "^3.2.4",
     "eslint": "^9.18.0",
+    "rimraf": "^5.0.5",
     "typescript": "^5.7.3",
+    "vite": "^5.0.12",
     "vitest": "^3.2.4"
   },
   "engines": {

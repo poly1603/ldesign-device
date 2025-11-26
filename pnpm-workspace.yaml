@@ -1,9 +1,0 @@
-# pnpm workspace configuration for @ldesign/device monorepo
-
-packages:
-  # 子包目录
-  - 'packages/**'
-  
-  # 示例项目（不发布）
-  - 'packages/*/examples'
-
