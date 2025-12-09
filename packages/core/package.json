@@ -24,48 +24,58 @@
     ".": {
       "types": "./es/index.d.ts",
       "import": "./es/index.js",
-      "require": "./lib/index.cjs"
+      "require": "./lib/index.cjs",
+      "default": "./es/index.js"
     },
     "./core": {
       "types": "./es/core/index.d.ts",
       "import": "./es/core/index.js",
-      "require": "./lib/core/index.cjs"
+      "require": "./lib/core/index.cjs",
+      "default": "./es/core/index.js"
     },
     "./core/*": {
       "types": "./es/core/*.d.ts",
       "import": "./es/core/*.js",
-      "require": "./lib/core/*.cjs"
+      "require": "./lib/core/*.cjs",
+      "default": "./es/core/*.js"
     },
     "./modules": {
       "types": "./es/modules/index.d.ts",
       "import": "./es/modules/index.js",
-      "require": "./lib/modules/index.cjs"
+      "require": "./lib/modules/index.cjs",
+      "default": "./es/modules/index.js"
     },
     "./modules/*": {
       "types": "./es/modules/*.d.ts",
       "import": "./es/modules/*.js",
-      "require": "./lib/modules/*.cjs"
+      "require": "./lib/modules/*.cjs",
+      "default": "./es/modules/*.js"
     },
     "./types": {
       "types": "./es/types/index.d.ts",
       "import": "./es/types/index.js",
-      "require": "./lib/types/index.cjs"
+      "require": "./lib/types/index.cjs",
+      "default": "./es/types/index.js"
     },
     "./types/*": {
       "types": "./es/types/*.d.ts",
       "import": "./es/types/*.js",
-      "require": "./lib/types/*.cjs"
+      "require": "./lib/types/*.cjs",
+      "default": "./es/types/*.js"
     },
     "./utils": {
       "types": "./es/utils/index.d.ts",
       "import": "./es/utils/index.js",
-      "require": "./lib/utils/index.cjs"
+      "require": "./lib/utils/index.cjs",
+      "default": "./es/utils/index.js"
     },
     "./utils/*": {
       "types": "./es/utils/*.d.ts",
       "import": "./es/utils/*.js",
-      "require": "./lib/utils/*.cjs"
-    }
+      "require": "./lib/utils/*.cjs",
+      "default": "./es/utils/*.js"
+    },
+    "./package.json": "./package.json"
   },
   "main": "./lib/index.cjs",
   "module": "./es/index.js",
@@ -75,15 +85,15 @@
   "files": [
     "README.md",
     "LICENSE",
-    "package.json",
+    "CHANGELOG.md",
     "es",
     "lib",
     "dist"
   ],
   "scripts": {
-    "build": "ldesign-builder build -f esm,cjs",
-    "build:watch": "ldesign-builder build -f esm,cjs --watch",
-    "dev": "ldesign-builder build -f esm,cjs --watch",
+    "build": "ldesign-builder build",
+    "build:watch": "ldesign-builder build --watch",
+    "dev": "ldesign-builder build --watch",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -109,5 +119,7 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "typings": "./es/index.d.ts",
+  "browser": "./dist/index.js"
 }

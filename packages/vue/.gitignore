@@ -3,6 +3,8 @@ es
 esm
 lib
 dist
+cjs
+esm
 
 # Dependencies
 node_modules

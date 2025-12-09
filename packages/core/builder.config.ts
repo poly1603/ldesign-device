@@ -1,21 +1,17 @@
+/**
+ * @ldesign/device-core 构建配置
+ */
 import { defineConfig } from '@ldesign/builder'
 
 export default defineConfig({
-  entry: 'src/index.ts',
-  output: {
-    formats: ['esm', 'cjs'],
-    esm: {
-      dir: 'es',
-    },
-    cjs: {
-      dir: 'lib',
-    },
-    name: 'LDesignDeviceCore',
-  },
-  minify: true,
-  sourcemap: true,
+  input: 'src/index.ts',
+  output: [
+    { format: 'esm', dir: 'es', preserveModules: true, preserveModulesRoot: 'src' },
+    { format: 'esm', dir: 'esm', preserveModules: true, preserveModulesRoot: 'src' },
+    { format: 'cjs', dir: 'lib', preserveModules: true, preserveModulesRoot: 'src' },
+    { format: 'umd', dir: 'dist', name: 'LDesignDeviceCore' },
+  ],
+  external: [],
   dts: true,
   clean: true,
 })
-
-
