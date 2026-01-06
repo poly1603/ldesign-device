@@ -246,6 +246,15 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 检查是否为移动设备
+   *
+   * @returns 如果是移动设备返回 true，否则返回 false
+   *
+   * @example
+   * ```typescript
+   * if (detector.isMobile()) {
+   *   showMobileNavigation()
+   * }
+   * ```
    */
   isMobile(): boolean {
     return this.currentDeviceInfo.type === 'mobile'
@@ -253,6 +262,15 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 检查是否为平板设备
+   *
+   * @returns 如果是平板设备返回 true，否则返回 false
+   *
+   * @example
+   * ```typescript
+   * if (detector.isTablet()) {
+   *   showTabletLayout()
+   * }
+   * ```
    */
   isTablet(): boolean {
     return this.currentDeviceInfo.type === 'tablet'
@@ -260,6 +278,15 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 检查是否为桌面设备
+   *
+   * @returns 如果是桌面设备返回 true，否则返回 false
+   *
+   * @example
+   * ```typescript
+   * if (detector.isDesktop()) {
+   *   enableAdvancedFeatures()
+   * }
+   * ```
    */
   isDesktop(): boolean {
     return this.currentDeviceInfo.type === 'desktop'
@@ -267,13 +294,36 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 检查是否为触摸设备
+   *
+   * @returns 如果支持触摸返回 true，否则返回 false
+   *
+   * @example
+   * ```typescript
+   * if (detector.isTouchDevice()) {
+   *   enableTouchGestures()
+   * } else {
+   *   enableMouseInteractions()
+   * }
+   * ```
    */
   isTouchDevice(): boolean {
     return this.currentDeviceInfo.isTouchDevice
   }
 
   /**
-   * 刷新设备信息
+   * 强制刷新设备信息
+   *
+   * 忽略检测频率限制，立即重新检测设备信息。
+   * 适用于需要立即获取最新设备状态的场景。
+   *
+   * @example
+   * ```typescript
+   * // 用户手动触发刷新
+   * refreshButton.addEventListener('click', () => {
+   *   detector.refresh()
+   *   updateUI(detector.getDeviceInfo())
+   * })
+   * ```
    */
   refresh(): void {
     // 强制重新检测，忽略频率限制
@@ -283,6 +333,30 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
 
   /**
    * 动态加载扩展模块
+   *
+   * 按需加载额外的设备检测模块，如网络状态、电池信息、地理位置等。
+   * 模块加载后会自动桥接事件到 DeviceDetector。
+   *
+   * @template T - 模块类型，默认为 DeviceModule
+   * @param name - 模块名称，支持: 'network' | 'battery' | 'geolocation' | 'media' | 'clipboard' | 'vibration' | 'wakeLock'
+   * @returns 加载的模块实例
+   * @throws 如果检测器已销毁或模块加载失败
+   *
+   * @example
+   * ```typescript
+   * // 加载网络模块
+   * const networkModule = await detector.loadModule('network')
+   * console.log(networkModule.isOnline())
+   *
+   * // 监听网络变化
+   * detector.on('networkChange', (info) => {
+   *   console.log('网络状态:', info.status)
+   * })
+   *
+   * // 加载电池模块
+   * const batteryModule = await detector.loadModule('battery')
+   * console.log('电量:', batteryModule.getLevel())
+   * ```
    */
   async loadModule<T extends DeviceModule = DeviceModule>(
     name: string,
@@ -361,7 +435,23 @@ export class DeviceDetector extends EventEmitter<DeviceDetectorEvents> {
   }
 
   /**
-   * 销毁检测器，清理资源
+   * 销毁检测器，清理所有资源
+   *
+   * 执行完整的清理流程：
+   * 1. 移除所有事件监听器
+   * 2. 清理定时器
+   * 3. 卸载所有已加载的模块
+   * 4. 清理缓存和性能指标
+   *
+   * 销毁后检测器将无法再使用，任何方法调用都可能抛出错误。
+   *
+   * @example
+   * ```typescript
+   * // 组件卸载时销毁检测器
+   * onUnmounted(async () => {
+   *   await detector.destroy()
+   * })
+   * ```
    */
   async destroy(): Promise<void> {
     if (this.isDestroyed)

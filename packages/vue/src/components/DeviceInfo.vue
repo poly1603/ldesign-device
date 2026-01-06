@@ -342,42 +342,101 @@ watch(() => deviceInfo.value, (newInfo) => {
 </template>
 
 <style scoped>
+/* ==================== CSS 变量定义 ==================== */
 .device-info {
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  background: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* 颜色变量 - 浅色主题 */
+  --di-bg-primary: #ffffff;
+  --di-bg-secondary: #f8f9fa;
+  --di-bg-tertiary: #e9ecef;
+  --di-border-color: #e1e5e9;
+  --di-text-primary: #212529;
+  --di-text-secondary: #6c757d;
+  --di-text-muted: #adb5bd;
+  --di-accent-color: #4f46e5;
+  --di-accent-hover: #4338ca;
+  --di-success-color: #10b981;
+  --di-warning-color: #f59e0b;
+  --di-error-color: #ef4444;
+  --di-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --di-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --di-radius: 12px;
+  --di-radius-sm: 8px;
+  --di-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  border: 1px solid var(--di-border-color);
+  border-radius: var(--di-radius);
+  background: var(--di-bg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--di-text-primary);
+  box-shadow: var(--di-shadow);
+  transition: var(--di-transition);
+  overflow: hidden;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .device-info {
+    --di-bg-primary: #1e1e2e;
+    --di-bg-secondary: #2a2a3e;
+    --di-bg-tertiary: #363650;
+    --di-border-color: #3f3f5c;
+    --di-text-primary: #e4e4e7;
+    --di-text-secondary: #a1a1aa;
+    --di-text-muted: #71717a;
+    --di-accent-color: #818cf8;
+    --di-accent-hover: #a5b4fc;
+    --di-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --di-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* 强制深色模式类 */
+.device-info.dark {
+  --di-bg-primary: #1e1e2e;
+  --di-bg-secondary: #2a2a3e;
+  --di-bg-tertiary: #363650;
+  --di-border-color: #3f3f5c;
+  --di-text-primary: #e4e4e7;
+  --di-text-secondary: #a1a1aa;
+  --di-text-muted: #71717a;
+  --di-accent-color: #818cf8;
+  --di-accent-hover: #a5b4fc;
 }
 
 .device-info--compact {
-  padding: 12px;
-}
-
-.device-info--detailed {
   padding: 16px;
 }
 
-.device-info--loading {
-  opacity: 0.7;
+.device-info--detailed {
+  padding: 20px;
 }
 
-/* 加载状态 */
+.device-info--loading {
+  opacity: 0.8;
+}
+
+.device-info:hover {
+  box-shadow: var(--di-shadow-lg);
+}
+
+/* ==================== 加载状态 ==================== */
 .device-info__loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px;
-  color: #666;
+  padding: 40px 32px;
+  color: var(--di-text-secondary);
+  gap: 16px;
 }
 
 .device-info__spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #e1e5e9;
-  border-top: 2px solid #007bff;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--di-bg-tertiary);
+  border-top: 3px solid var(--di-accent-color);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes spin {
@@ -385,154 +444,298 @@ watch(() => deviceInfo.value, (newInfo) => {
   100% { transform: rotate(360deg); }
 }
 
-/* 错误状态 */
+/* 骨架屏效果 */
+.device-info__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+
+.device-info__skeleton-item {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--di-bg-secondary) 25%,
+    var(--di-bg-tertiary) 50%,
+    var(--di-bg-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.device-info__skeleton-item:nth-child(1) { width: 60%; }
+.device-info__skeleton-item:nth-child(2) { width: 80%; }
+.device-info__skeleton-item:nth-child(3) { width: 40%; }
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ==================== 错误状态 ==================== */
 .device-info__error {
   display: flex;
-  align-items: center;
-  padding: 16px;
-  color: #dc3545;
+  align-items: flex-start;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+  border-radius: var(--di-radius-sm);
+  margin: 8px;
 }
 
 .device-info__error-icon {
-  font-size: 24px;
-  margin-right: 12px;
+  font-size: 28px;
+  margin-right: 16px;
+  flex-shrink: 0;
 }
 
 .device-info__error-content h4 {
-  margin: 0 0 4px 0;
-  font-size: 14px;
+  margin: 0 0 6px 0;
+  font-size: 15px;
   font-weight: 600;
+  color: var(--di-error-color);
 }
 
 .device-info__error-content p {
-  margin: 0 0 8px 0;
-  font-size: 12px;
-  color: #6c757d;
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: var(--di-text-secondary);
+  line-height: 1.5;
 }
 
 .device-info__retry-btn {
-  padding: 4px 8px;
-  font-size: 12px;
-  background: #dc3545;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--di-error-color);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--di-radius-sm);
   cursor: pointer;
+  transition: var(--di-transition);
 }
 
-/* 紧凑模式 */
+.device-info__retry-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.device-info__retry-btn:active {
+  transform: translateY(0);
+}
+
+/* ==================== 内容区域 ==================== */
+.device-info__content {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== 紧凑模式 ==================== */
 .device-info__compact {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .device-info__icon {
-  font-size: 20px;
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--di-bg-secondary);
+  border-radius: var(--di-radius-sm);
+  flex-shrink: 0;
 }
 
 .device-info__basic {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .device-info__type {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
+  color: var(--di-text-primary);
 }
 
 .device-info__size {
-  font-size: 12px;
-  color: #6c757d;
+  font-size: 13px;
+  color: var(--di-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
-/* 详细模式 */
+.device-info__actions {
+  flex-shrink: 0;
+}
+
+/* ==================== 详细模式 ==================== */
 .device-info__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #e1e5e9;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--di-border-color);
 }
 
 .device-info__title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .device-info__title h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
+  color: var(--di-text-primary);
 }
 
 .device-info__refresh-btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  background: #007bff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--di-accent-color);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--di-radius-sm);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--di-transition);
 }
 
 .device-info__refresh-btn:hover {
-  background: #0056b3;
+  background: var(--di-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.device-info__refresh-btn:active {
+  transform: translateY(0);
 }
 
 .device-info__sections {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+}
+
+.device-info__section {
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.device-info__section:nth-child(1) { animation-delay: 0s; }
+.device-info__section:nth-child(2) { animation-delay: 0.05s; }
+.device-info__section:nth-child(3) { animation-delay: 0.1s; }
+.device-info__section:nth-child(4) { animation-delay: 0.15s; }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .device-info__section h4 {
-  margin: 0 0 8px 0;
-  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-size: 13px;
   font-weight: 600;
-  color: #495057;
+  color: var(--di-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .device-info__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
 }
 
 .device-info__item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
-  background: #f8f9fa;
-  border-radius: 4px;
+  padding: 12px 14px;
+  background: var(--di-bg-secondary);
+  border-radius: var(--di-radius-sm);
+  transition: var(--di-transition);
+  border: 1px solid transparent;
+}
+
+.device-info__item:hover {
+  background: var(--di-bg-tertiary);
+  border-color: var(--di-border-color);
 }
 
 .device-info__item label {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--di-text-secondary);
   font-weight: 500;
 }
 
 .device-info__item span {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  color: var(--di-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
-/* 自定义内容 */
+/* ==================== 自定义内容 ==================== */
 .device-info__custom {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #e1e5e9;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--di-border-color);
 }
 
-/* 响应式设计 */
+/* ==================== 设备类型指示器 ==================== */
+.device-info--mobile .device-info__icon {
+  background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+  color: white;
+}
+
+.device-info--tablet .device-info__icon {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: white;
+}
+
+.device-info--desktop .device-info__icon {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+}
+
+/* ==================== 响应式设计 ==================== */
 @media (max-width: 768px) {
+  .device-info {
+    --di-radius: 8px;
+  }
+
+  .device-info--detailed {
+    padding: 16px;
+  }
+
   .device-info__grid {
     grid-template-columns: 1fr;
   }
@@ -540,7 +743,41 @@ watch(() => deviceInfo.value, (newInfo) => {
   .device-info__header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
+  }
+
+  .device-info__refresh-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .device-info__item {
+    padding: 10px 12px;
+  }
+}
+
+/* ==================== 无障碍支持 ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .device-info,
+  .device-info__spinner,
+  .device-info__content,
+  .device-info__section,
+  .device-info__item,
+  .device-info__refresh-btn,
+  .device-info__retry-btn {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ==================== 高对比度模式 ==================== */
+@media (prefers-contrast: high) {
+  .device-info {
+    border-width: 2px;
+  }
+
+  .device-info__item {
+    border: 1px solid var(--di-border-color);
   }
 }
 </style>

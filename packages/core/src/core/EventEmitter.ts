@@ -13,17 +13,41 @@ interface ListenerWrapper<T = unknown> {
 /**
  * 高性能事件发射器实现
  *
- * 优化特性:
- * - 避免在emit时创建新数组,直接遍历Set
- * - 添加性能监控
- * - 优化内存使用
- * - 支持事件监听器弱引用
- * 
- * 高级特性：
- * - 监听器优先级
- * - 通配符事件
- * - 命名空间
- * - 内存泄漏检测
+ * 提供可靠的事件订阅/发布机制，支持多种高级特性。
+ *
+ * ## 性能优化
+ * - 延迟排序: 只在 emit 时排序，减少不必要的排序操作
+ * - 批量处理: 避免在 emit 时创建新数组
+ * - 内存优化: 自动清理无效监听器
+ *
+ * ## 高级特性
+ * - **优先级**: 监听器可设置优先级，数字越大越先执行
+ * - **通配符**: 使用 '*' 监听所有事件
+ * - **命名空间**: 按命名空间批量移除监听器
+ * - **一次性监听**: once() 方法支持自动移除的监听器
+ *
+ * @template T - 事件类型映射，键为事件名，值为事件数据类型
+ *
+ * @example
+ * ```typescript
+ * // 定义事件类型
+ * interface MyEvents {
+ *   change: { value: number }
+ *   error: Error
+ * }
+ *
+ * const emitter = new EventEmitter<MyEvents>()
+ *
+ * // 基础用法
+ * emitter.on('change', (data) => console.log(data.value))
+ * emitter.emit('change', { value: 42 })
+ *
+ * // 带优先级
+ * emitter.on('change', handler, { priority: 10 })
+ *
+ * // 通配符监听所有事件
+ * emitter.on('*', (data) => console.log('任意事件:', data))
+ * ```
  */
 export class EventEmitter<
   T extends Record<string, unknown> = Record<string, unknown>,

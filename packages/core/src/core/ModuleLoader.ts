@@ -3,13 +3,47 @@ import process from 'node:process'
 import { asyncPool } from '../utils'
 
 /**
- * 高性能模块加载器实现
- * 
- * 新增特性：
- * - 模块预加载
- * - 并行加载
- * - 依赖管理
- * - 优先级加载
+ * 高性能模块加载器
+ *
+ * 提供灵活的模块加载机制，支持按需加载和延迟加载。
+ *
+ * ## 核心特性
+ * - **懒加载**: 模块在首次访问时才加载，减少初始化开销
+ * - **预加载**: 可在空闲时预加载常用模块
+ * - **并行加载**: 支持并行加载多个模块，可控制并发数
+ * - **依赖管理**: 自动解析模块依赖关系，确保加载顺序
+ * - **优先级**: 可为模块设置加载优先级
+ *
+ * ## 容错机制
+ * - 加载失败自动重试（默认3次）
+ * - 指数退避策略
+ * - 详细的加载统计信息
+ *
+ * ## 支持的模块
+ * - `network`: 网络状态检测
+ * - `battery`: 电池信息
+ * - `geolocation`: 地理位置
+ * - `media`: 媒体设备
+ * - `clipboard`: 剪贴板
+ * - `vibration`: 设备振动
+ * - `wakeLock`: 屏幕唤醒锁
+ *
+ * @example
+ * ```typescript
+ * const loader = new ModuleLoader()
+ *
+ * // 加载单个模块
+ * const networkModule = await loader.loadModuleInstance('network')
+ *
+ * // 批量加载模块
+ * const modules = await loader.loadMultiple(['network', 'battery'])
+ *
+ * // 预加载模块
+ * await loader.preload(['geolocation', 'media'])
+ *
+ * // 获取加载统计
+ * console.log(loader.getLoadingStats())
+ * ```
  */
 export class ModuleLoader implements IModuleLoader {
   private modules: Map<string, DeviceModule> = new Map()

@@ -297,195 +297,417 @@ watch(() => [props.autoRefresh, props.refreshInterval], () => {
 </template>
 
 <style scoped>
+/* ==================== CSS 变量定义 ==================== */
 .network-status {
+  /* 颜色变量 - 浅色主题 */
+  --ns-bg-primary: #ffffff;
+  --ns-bg-secondary: #f8f9fa;
+  --ns-bg-tertiary: #e9ecef;
+  --ns-border-color: #e1e5e9;
+  --ns-text-primary: #212529;
+  --ns-text-secondary: #6c757d;
+  --ns-online-color: #10b981;
+  --ns-online-bg: rgba(16, 185, 129, 0.1);
+  --ns-offline-color: #ef4444;
+  --ns-offline-bg: rgba(239, 68, 68, 0.1);
+  --ns-slow-color: #f59e0b;
+  --ns-slow-bg: rgba(245, 158, 11, 0.1);
+  --ns-accent-color: #4f46e5;
+  --ns-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --ns-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --ns-radius: 12px;
+  --ns-radius-sm: 8px;
+  --ns-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--ns-text-primary);
 }
 
-/* 加载状态 */
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .network-status {
+    --ns-bg-primary: #1e1e2e;
+    --ns-bg-secondary: #2a2a3e;
+    --ns-bg-tertiary: #363650;
+    --ns-border-color: #3f3f5c;
+    --ns-text-primary: #e4e4e7;
+    --ns-text-secondary: #a1a1aa;
+    --ns-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --ns-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 强制深色模式类 */
+.network-status.dark {
+  --ns-bg-primary: #1e1e2e;
+  --ns-bg-secondary: #2a2a3e;
+  --ns-bg-tertiary: #363650;
+  --ns-border-color: #3f3f5c;
+  --ns-text-primary: #e4e4e7;
+  --ns-text-secondary: #a1a1aa;
+}
+
+/* ==================== 加载状态 ==================== */
 .network-status__loading {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #6c757d;
+  gap: 10px;
+  color: var(--ns-text-secondary);
+  padding: 8px 0;
 }
 
 .network-status__spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid #e1e5e9;
-  border-top: 2px solid #007bff;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--ns-bg-tertiary);
+  border-top: 2px solid var(--ns-accent-color);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: ns-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-@keyframes spin {
+@keyframes ns-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* 错误状态 */
+/* ==================== 错误状态 ==================== */
 .network-status__error {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: #dc3545;
-  font-size: 14px;
+  gap: 6px;
+  color: var(--ns-offline-color);
+  font-size: 13px;
+  padding: 6px 10px;
+  background: var(--ns-offline-bg);
+  border-radius: var(--ns-radius-sm);
 }
 
-/* 图标模式 */
-.network-status__icon {
+.network-status__error-icon {
   font-size: 16px;
+}
+
+/* ==================== 图标模式 ==================== */
+.network-status__icon {
+  font-size: 20px;
   cursor: default;
+  transition: var(--ns-transition);
 }
 
 .network-status__icon--online {
-  color: #28a745;
+  color: var(--ns-online-color);
+  animation: ns-pulse 2s ease-in-out infinite;
 }
 
 .network-status__icon--offline {
-  color: #dc3545;
+  color: var(--ns-offline-color);
 }
 
-/* 文字模式 */
+@keyframes ns-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
+}
+
+/* ==================== 文字模式 ==================== */
 .network-status__text {
   font-size: 14px;
   font-weight: 500;
+  transition: var(--ns-transition);
 }
 
 .network-status--online .network-status__text {
-  color: #28a745;
+  color: var(--ns-online-color);
 }
 
 .network-status--offline .network-status__text {
-  color: #dc3545;
+  color: var(--ns-offline-color);
 }
 
-/* 详细模式 */
+/* ==================== 详细模式 ==================== */
 .network-status__detailed {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  width: 100%;
 }
 
 .network-status__main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .network-status__info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  flex: 1;
 }
 
 .network-status__status {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.network-status--online .network-status__status {
+  color: var(--ns-online-color);
+}
+
+.network-status--offline .network-status__status {
+  color: var(--ns-offline-color);
+}
+
+/* 状态指示器小圆点 */
+.network-status__indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.network-status--online .network-status__indicator {
+  background: var(--ns-online-color);
+  box-shadow: 0 0 8px var(--ns-online-color);
+  animation: ns-glow 2s ease-in-out infinite;
+}
+
+.network-status--offline .network-status__indicator {
+  background: var(--ns-offline-color);
+}
+
+@keyframes ns-glow {
+  0%, 100% { box-shadow: 0 0 4px var(--ns-online-color); }
+  50% { box-shadow: 0 0 12px var(--ns-online-color); }
 }
 
 .network-status__type {
   font-size: 12px;
-  color: #6c757d;
+  color: var(--ns-text-secondary);
 }
 
 .network-status__details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding-left: 24px;
+  gap: 8px;
+  padding: 12px;
+  background: var(--ns-bg-secondary);
+  border-radius: var(--ns-radius-sm);
+  margin-top: 4px;
 }
 
 .network-status__detail {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .network-status__detail label {
-  color: #6c757d;
-}
-
-.network-status__detail span {
+  color: var(--ns-text-secondary);
   font-weight: 500;
 }
 
-/* 进度条模式 */
+.network-status__detail span {
+  font-weight: 600;
+  color: var(--ns-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==================== 进度条模式 ==================== */
 .network-status__progress {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 120px;
+  gap: 8px;
+  min-width: 160px;
+  width: 100%;
 }
 
 .network-status__progress-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 12px;
+  font-size: 13px;
+}
+
+.network-status__progress-header span:first-child {
+  font-weight: 600;
+  color: var(--ns-text-primary);
+}
+
+.network-status__progress-header span:last-child {
+  color: var(--ns-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .network-status__progress-bar {
-  height: 4px;
-  background: #e1e5e9;
-  border-radius: 2px;
+  height: 6px;
+  background: var(--ns-bg-tertiary);
+  border-radius: 3px;
   overflow: hidden;
+  position: relative;
 }
 
 .network-status__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #28a745, #20c997);
-  transition: width 0.3s ease;
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.network-status--online .network-status__progress-fill {
+  background: linear-gradient(90deg, var(--ns-online-color) 0%, #34d399 100%);
 }
 
 .network-status--offline .network-status__progress-fill {
-  background: #dc3545;
+  background: var(--ns-offline-color);
+  width: 100%;
 }
 
-/* 刷新按钮 */
+/* 进度条动画效果 */
+.network-status__progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: ns-shimmer 2s infinite;
+}
+
+@keyframes ns-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* ==================== 信号强度指示器 ==================== */
+.network-status__signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.network-status__signal-bar {
+  width: 4px;
+  background: var(--ns-bg-tertiary);
+  border-radius: 2px;
+  transition: var(--ns-transition);
+}
+
+.network-status__signal-bar:nth-child(1) { height: 4px; }
+.network-status__signal-bar:nth-child(2) { height: 8px; }
+.network-status__signal-bar:nth-child(3) { height: 12px; }
+.network-status__signal-bar:nth-child(4) { height: 16px; }
+
+.network-status--online .network-status__signal-bar.active {
+  background: var(--ns-online-color);
+}
+
+.network-status--offline .network-status__signal-bar {
+  background: var(--ns-offline-color);
+  opacity: 0.3;
+}
+
+/* ==================== 刷新按钮 ==================== */
 .network-status__refresh {
-  padding: 4px;
-  background: none;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: var(--ns-bg-secondary);
+  border: 1px solid var(--ns-border-color);
+  border-radius: var(--ns-radius-sm);
   cursor: pointer;
-  font-size: 12px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  font-size: 14px;
+  transition: var(--ns-transition);
 }
 
 .network-status__refresh:hover {
-  opacity: 1;
+  background: var(--ns-bg-tertiary);
+  transform: rotate(180deg);
 }
 
 .network-status__refresh:disabled {
-  opacity: 0.3;
+  opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* 不同显示模式的样式调整 */
+.network-status__refresh:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+/* ==================== 显示模式样式 ==================== */
 .network-status--icon {
   justify-content: center;
+  padding: 8px;
 }
 
 .network-status--text {
   justify-content: flex-start;
+  padding: 8px 12px;
 }
 
 .network-status--detailed {
-  padding: 8px;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  background: #ffffff;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--ns-border-color);
+  border-radius: var(--ns-radius);
+  background: var(--ns-bg-primary);
+  box-shadow: var(--ns-shadow);
+  transition: var(--ns-transition);
+}
+
+.network-status--detailed:hover {
+  box-shadow: var(--ns-shadow-lg);
 }
 
 .network-status--progress {
-  padding: 6px;
-  border: 1px solid #e1e5e9;
-  border-radius: 6px;
-  background: #ffffff;
+  flex-direction: column;
+  padding: 14px 16px;
+  border: 1px solid var(--ns-border-color);
+  border-radius: var(--ns-radius);
+  background: var(--ns-bg-primary);
+  box-shadow: var(--ns-shadow);
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+  .network-status--detailed,
+  .network-status--progress {
+    padding: 12px;
+  }
+
+  .network-status__details {
+    padding: 10px;
+  }
+}
+
+/* ==================== 无障碍支持 ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .network-status__spinner,
+  .network-status__icon--online,
+  .network-status__progress-fill,
+  .network-status__progress-fill::after,
+  .network-status__refresh,
+  .network-status--online .network-status__indicator {
+    animation: none;
+  }
+
+  .network-status__progress-fill::after {
+    display: none;
+  }
 }
 </style>
